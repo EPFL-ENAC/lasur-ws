@@ -11,7 +11,7 @@ ARG SSH_PRIVATE_KEY
 
 # Set up SSH
 RUN mkdir -p /root/.ssh && \
-    echo "${SSH_PRIVATE_KEY}" > /root/.ssh/id_ed25519 && \
+    echo "${SSH_PRIVATE_KEY}" | base64 -d > /root/.ssh/id_ed25519 && \
     chmod 600 /root/.ssh/id_ed25519 && \
     # Accept host keys automatically
     echo "StrictHostKeyChecking no" >> /root/.ssh/config
