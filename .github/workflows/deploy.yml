@@ -12,7 +12,7 @@ env:
   IMAGE_NAME: ${{github.repository}}
 jobs:
   deploy:
-    uses: EPFL-ENAC/epfl-enac-build-push-deploy-action/.github/workflows/deploy.yml@ssh
+    uses: EPFL-ENAC/epfl-enac-build-push-deploy-action/.github/workflows/deploy.yml@v2.3.0
     secrets:
       token: ${{ secrets.CD_TOKEN }}
       private_key: ${{ secrets.SSH_PRIVATE_KEY }}
