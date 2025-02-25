@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "lasur-ws"
+version = "0.1.0"
+description = "LASUR Web Services"
+authors = ["ymarcon <yannick.marcon@epfl.ch>"]
+license = "GPLv3"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.115.8"
+uvicorn = "^0.34.0"
+typo-modal = {git = "ssh://git@github.com/EPFL-ENAC/typo_modal.git", rev = "main"}
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
