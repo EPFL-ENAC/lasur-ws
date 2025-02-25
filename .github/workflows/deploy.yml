@@ -20,10 +20,11 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan github.com >> ~/.ssh/known_hosts
-      - name: Configure SSH Agent for Docker
+      - name: Start SSH Agent
         run: |
           eval $(ssh-agent -s)
           ssh-add ~/.ssh/id_ed25519
+          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
   deploy:
     uses: EPFL-ENAC/epfl-enac-build-push-deploy-action/.github/workflows/deploy.yml@ssh
     secrets:
