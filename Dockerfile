@@ -3,8 +3,18 @@ ENV POETRY_VERSION=1.8.3
 RUN pip install "poetry==$POETRY_VERSION"
 ENV PYTHONPATH="$PYTHONPATH:/app"
 
-WORKDIR /app
+# Enable SSH agent forwarding
+RUN apt-get update && apt-get install -y openssh-client
 
+# Use SSH for accessing private GitHub repos
+RUN mkdir -p /root/.ssh && chmod 700 /root/.ssh
+RUN ssh-keyscan github.com >> /root/.ssh/known_hosts
+
+# Set SSH_AUTH_SOCK to use forwarded SSH credentials
+ARG SSH_AUTH_SOCK
+ENV SSH_AUTH_SOCK=${SSH_AUTH_SOCK}
+
+WORKDIR /app
 COPY poetry.lock pyproject.toml /app/
 RUN poetry config installer.max-workers 10
 RUN poetry config virtualenvs.create false
