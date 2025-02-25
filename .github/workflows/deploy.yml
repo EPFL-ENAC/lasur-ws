@@ -15,6 +15,7 @@ jobs:
     uses: EPFL-ENAC/epfl-enac-build-push-deploy-action/.github/workflows/deploy.yml@ssh
     secrets:
       token: ${{ secrets.CD_TOKEN }}
+      private_key: ${{ secrets.SSH_PRIVATE_KEY }}
     with:
       # Optional inputs can be passed here
       org: epfl-lasur
