@@ -22,6 +22,8 @@ RUN poetry config installer.max-workers 10
 RUN poetry config virtualenvs.create false
 RUN apt-get update && apt-get install -y g++ libpq-dev libgl1 gdal-bin libgdal-dev
 RUN poetry install --no-interaction --no-root
+
+COPY start.sh /app/
 COPY api /app/api
 
 # Important: Remove the SSH key when no longer needed
