@@ -11,6 +11,7 @@ python = "^3.10"
 fastapi = "^0.115.8"
 uvicorn = "^0.34.0"
 typo-modal = {git = "ssh://git@github.com/EPFL-ENAC/typo_modal.git", rev = "main"}
+pydantic-settings = "^2.8.0"
 
 
 [tool.poetry.group.dev.dependencies]

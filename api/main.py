@@ -2,6 +2,8 @@ from fastapi import FastAPI, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from logging import basicConfig, INFO, DEBUG
 from pydantic import BaseModel
+from .views.modal_typo import router as modal_typo_router
+
 basicConfig(level=DEBUG)
 
 app = FastAPI()
@@ -37,3 +39,10 @@ async def get_health(
     readiness probes.
     """
     return HealthCheck(status="OK")
+
+
+app.include_router(
+    modal_typo_router,
+    prefix="/modal-typo",
+    tags=["Modal Typology"],
+)
