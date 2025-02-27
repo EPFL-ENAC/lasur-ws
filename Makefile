@@ -4,6 +4,9 @@ build:
 install:
 	poetry install
 
+update:
+	poetry lock
+
 test:
 	poetry run pytest -s
 
