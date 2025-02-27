@@ -3,29 +3,27 @@ ENV POETRY_VERSION=1.8.3
 RUN pip install "poetry==$POETRY_VERSION"
 ENV PYTHONPATH="$PYTHONPATH:/app"
 
-# Install openssh-client
-RUN apt-get update && apt-get install -y openssh-client git
-
 # Add build argument for SSH key
 ARG SSH_PRIVATE_KEY
-
-# Set up SSH
-RUN mkdir -p /root/.ssh && \
-    echo "${SSH_PRIVATE_KEY}" | base64 -d > /root/.ssh/id_ed25519 && \
-    chmod 600 /root/.ssh/id_ed25519 && \
-    # Accept host keys automatically
-    echo "StrictHostKeyChecking no" >> /root/.ssh/config
-
-WORKDIR /app
-
 # Private packages to precompile and source files to remove
 ENV PRIVATE_PACKAGES="typo_modal"
 
+WORKDIR /app
+
 COPY poetry.lock pyproject.toml /app/
 
-RUN poetry config installer.max-workers 10 && \
+RUN \
+    # Set up SSH
+    apt-get update && apt-get install -y openssh-client git && \
+    mkdir -p /root/.ssh && \
+    echo "${SSH_PRIVATE_KEY}" | base64 -d > /root/.ssh/id_ed25519 && \
+    chmod 600 /root/.ssh/id_ed25519 && \
+    # Accept host keys automatically
+    echo "StrictHostKeyChecking no" >> /root/.ssh/config && \
+    # Install packages
+    poetry config installer.max-workers 10 && \
     poetry config virtualenvs.create false && \
-    apt-get update && apt-get install -y g++ libpq-dev libgl1 gdal-bin libgdal-dev && \
+    apt-get install -y g++ libpq-dev libgl1 gdal-bin libgdal-dev && \
     poetry install --no-interaction --no-root && \
     # Remove python caches
     rm -rf /root/.cache/pypoetry /root/.cache/pip && \
