@@ -17,15 +17,22 @@ RUN mkdir -p /root/.ssh && \
     echo "StrictHostKeyChecking no" >> /root/.ssh/config
 
 WORKDIR /app
+
+# Private packages to precompile and source files to remove
+ENV PRIVATE_PACKAGES="typo_modal"
+
 COPY poetry.lock pyproject.toml /app/
+
 RUN poetry config installer.max-workers 10 && \
     poetry config virtualenvs.create false && \
     apt-get update && apt-get install -y g++ libpq-dev libgl1 gdal-bin libgdal-dev && \
-    poetry install --no-interaction --no-root
-
-# Precompile private packages and remove source files
-ENV PACKAGES="typo_modal"
-RUN for pkg in $PACKAGES; do \
+    poetry install --no-interaction --no-root && \
+    # Remove python caches
+    rm -rf /root/.cache/pypoetry /root/.cache/pip && \
+    # Important: Remove the SSH key after using it
+    rm -rf /root/.ssh/ && \
+    # Precompile and remove source files
+    for pkg in $PRIVATE_PACKAGES; do \
         path=$(python -c "import $pkg; print($pkg.__path__[0])" 2>/dev/null) && \
         if [ -n "$path" ]; then \
             echo "Compiling $pkg at $path..."; \
@@ -38,8 +45,5 @@ RUN for pkg in $PACKAGES; do \
 
 COPY start.sh /app/
 COPY api /app/api
-
-# Important: Remove the SSH key when no longer needed
-RUN rm -rf /root/.ssh/
 
 ENTRYPOINT sh start.sh
