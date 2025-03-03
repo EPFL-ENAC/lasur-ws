@@ -8,6 +8,7 @@ class ODData(BaseModel):
     d_lon: float
     d_lat: float
 
+
 class TypoData(BaseModel):
     a_voit: int
     a_moto: int
@@ -22,7 +23,8 @@ class TypoData(BaseModel):
     i_fiab: int
     i_prof: int
     i_envi: int
-    
+
+
 class RecoData(BaseModel):
     o_lon: float
     o_lat: float
@@ -49,3 +51,26 @@ class RecoData(BaseModel):
     i_fiab: int
     i_prof: int
     i_envi: int
+
+
+class RecoProData(BaseModel):
+    score_velo: int
+    score_tpu: int
+    score_train: int
+    score_elec: int
+    fr_pro_loc: int
+    fr_pro_reg: int
+    fr_pro_int: int
+    fm_pro_loc_voit: int
+    fm_pro_loc_moto: int
+    fm_pro_loc_tpu: int
+    fm_pro_loc_train: int
+    fm_pro_loc_velo: int
+    fm_pro_loc_marc: int
+    fm_pro_reg_voit: int
+    fm_pro_reg_moto: int
+    fm_pro_reg_train: int
+    fm_pro_reg_avio: int
+    fm_pro_int_voit: int
+    fm_pro_int_train: int
+    fm_pro_int_avio: int
