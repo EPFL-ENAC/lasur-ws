@@ -3,7 +3,7 @@ from typing import Dict
 from fastapi import APIRouter, Security
 from ..auth import get_api_key
 from typo_modal.service import TypoModalService, load_data
-from ..models.modal_typo import ODData, TypoData, RecoData, RecoProData
+from ..models.modal_typo import ODData, TypoData, RecoData, RecoMultiData, RecoProData, EmplData
 
 router = APIRouter()
 
@@ -90,6 +90,46 @@ async def compute_reco(
         return {'error': str(e)}
 
 
+@router.post("/reco-multi", response_model=Dict)
+async def compute_reco_multi(
+    data: RecoMultiData,
+    api_key: str = Security(get_api_key),
+) -> Dict:
+    """Compute modal recommendation based on the provided data."""
+    service = TypoModalService(od_mm, orig_dess, dest_dess)
+    try:
+        t_traj_mm = service.compute_geo(
+            data.o_lon, data.o_lat, data.d_lon, data.d_lat)
+        reco_dt2, scores, access = service.compute_reco_multi(t_traj_mm,
+                                                              data.tps_traj,
+                                                              data.constraints,
+                                                              data.fm_dt_voit,
+                                                              data.fm_dt_moto,
+                                                              data.fm_dt_tpu,
+                                                              data.fm_dt_train,
+                                                              data.fm_dt_velo,
+                                                              data.fm_dt_march,
+                                                              data.fm_dt_inter,
+                                                              data.a_voit,
+                                                              data.a_moto,
+                                                              data.a_tpu,
+                                                              data.a_train,
+                                                              data.a_velo,
+                                                              data.a_marc,
+                                                              data.i_tmps,
+                                                              data.i_prix,
+                                                              data.i_flex,
+                                                              data.i_conf,
+                                                              data.i_fiab,
+                                                              data.i_prof,
+                                                              data.i_envi
+                                                              )
+        return {'reco_dt2': reco_dt2, 'scores': scores, 'access': access}
+    except Exception as e:
+        logging.error(e, exc_info=True)
+        return {'error': str(e)}
+
+
 @router.post("/reco-pro", response_model=Dict)
 async def compute_reco_pro(
     data: RecoProData,
@@ -119,6 +159,26 @@ async def compute_reco_pro(
                                                                             data.fm_pro_int_train,
                                                                             data.fm_pro_int_avio)
         return {'reco_pro_loc': reco_pro_loc, 'reco_pro_reg': reco_pro_reg, 'reco_pro_int': reco_pro_int}
+    except Exception as e:
+        logging.error(e, exc_info=True)
+        return {'error': str(e)}
+
+
+@router.post("/empl", response_model=Dict)
+async def compute_empl_actions(
+    data: EmplData,
+    api_key: str = Security(get_api_key),
+) -> Dict:
+    """Compute employer actions based on the provided data."""
+    service = TypoModalService(od_mm, orig_dess, dest_dess)
+    try:
+        mesure_dt1, mesure_dt2, mesure_pro_loc, mesure_pro_regint = service.compute_mesu_empl(
+            data.empl.model_dump(),
+            data.reco_dt2,
+            data.reco_pro_loc,
+            data.reco_pro_reg,
+            data.reco_pro_int)
+        return {'mesure_dt1': mesure_dt1, 'mesure_dt2': mesure_dt2, 'mesure_pro_loc': mesure_pro_loc, 'mesure_pro_regint': mesure_pro_regint}
     except Exception as e:
         logging.error(e, exc_info=True)
         return {'error': str(e)}
