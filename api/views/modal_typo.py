@@ -32,7 +32,7 @@ async def compute_typo(
     """Compute modal typology based on the provided data."""
     service = TypoModalService(od_mm, orig_dess, dest_dess)
     try:
-        return service.compute_typo(
+        typo = service.compute_typo(
             data.a_voit,
             data.a_moto,
             data.a_tpu,
@@ -46,6 +46,7 @@ async def compute_typo(
             data.i_fiab,
             data.i_prof,
             data.i_envi)
+        return {'typo': typo}
     except Exception as e:
         logging.error(e, exc_info=True)
         return {'error': str(e)}
