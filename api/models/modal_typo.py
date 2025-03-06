@@ -122,6 +122,6 @@ class EmplActions(BaseModel):
 class EmplData(BaseModel):
     empl: EmplActions
     reco_dt2: List[str]
-    reco_pro_loc: List[str]
-    reco_pro_reg: List[str]
-    reco_pro_int: List[str]
+    reco_pro_loc: str
+    reco_pro_reg: str
+    reco_pro_int: str
