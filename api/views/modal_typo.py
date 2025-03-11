@@ -138,26 +138,28 @@ async def compute_reco_pro(
     """Compute pro modal recommendation based on the provided data."""
     service = TypoModalService(od_mm, orig_dess, dest_dess)
     try:
-        reco_pro_loc, reco_pro_reg, reco_pro_int = service.compute_reco_pro(data.score_velo,
-                                                                            data.score_tpu,
-                                                                            data.score_train,
-                                                                            data.score_elec,
-                                                                            data.fr_pro_loc,
-                                                                            data.fr_pro_reg,
-                                                                            data.fr_pro_int,
-                                                                            data.fm_pro_loc_voit,
-                                                                            data.fm_pro_loc_moto,
-                                                                            data.fm_pro_loc_tpu,
-                                                                            data.fm_pro_loc_train,
-                                                                            data.fm_pro_loc_velo,
-                                                                            data.fm_pro_loc_marc,
-                                                                            data.fm_pro_reg_voit,
-                                                                            data.fm_pro_reg_moto,
-                                                                            data.fm_pro_reg_train,
-                                                                            data.fm_pro_reg_avio,
-                                                                            data.fm_pro_int_voit,
-                                                                            data.fm_pro_int_train,
-                                                                            data.fm_pro_int_avio)
+        reco_pro_loc, reco_pro_reg, reco_pro_int = service.compute_reco_pro({
+            'velo': data.score_velo,
+            'tpu': data.score_tpu,
+            'train': data.score_train,
+            'elec': data.score_elec
+        },
+            data.fr_pro_loc,
+            data.fr_pro_reg,
+            data.fr_pro_int,
+            data.fm_pro_loc_voit,
+            data.fm_pro_loc_moto,
+            data.fm_pro_loc_tpu,
+            data.fm_pro_loc_train,
+            data.fm_pro_loc_velo,
+            data.fm_pro_loc_marc,
+            data.fm_pro_reg_voit,
+            data.fm_pro_reg_moto,
+            data.fm_pro_reg_train,
+            data.fm_pro_reg_avio,
+            data.fm_pro_int_voit,
+            data.fm_pro_int_train,
+            data.fm_pro_int_avio)
         return {'reco_pro_loc': reco_pro_loc, 'reco_pro_reg': reco_pro_reg, 'reco_pro_int': reco_pro_int}
     except Exception as e:
         logging.error(e, exc_info=True)
