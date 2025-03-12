@@ -11,4 +11,4 @@ test:
 	poetry run pytest -s
 
 run:
-	poetry run uvicorn limnc_flaked.main:app --reload
+	poetry run uvicorn api.main:app --reload

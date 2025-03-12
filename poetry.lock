@@ -868,7 +868,7 @@ pyarrow = "^19.0.1"
 type = "git"
 url = "ssh://git@github.com/EPFL-ENAC/lasur-typo_modal.git"
 reference = "main"
-resolved_reference = "73fbdf4a66756bc04374966e90e0e80cc502fb46"
+resolved_reference = "d8c368a06ef5240d033035f3612f5e95a200ce3e"
 
 [[package]]
 name = "tzdata"
