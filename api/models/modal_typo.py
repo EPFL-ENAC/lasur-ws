@@ -87,9 +87,9 @@ class RecoProData(BaseModel):
     score_tpu: int
     score_train: int
     score_elec: int
-    fr_pro_loc: int
-    fr_pro_reg: int
-    fr_pro_int: int
+    pro_loc: bool
+    pro_reg: bool
+    pro_int: bool
     fm_pro_loc_voit: int
     fm_pro_loc_moto: int
     fm_pro_loc_tpu: int

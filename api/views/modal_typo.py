@@ -144,9 +144,9 @@ async def compute_reco_pro(
             'train': data.score_train,
             'elec': data.score_elec
         },
-            data.fr_pro_loc,
-            data.fr_pro_reg,
-            data.fr_pro_int,
+            data.pro_loc,
+            data.pro_reg,
+            data.pro_int,
             data.fm_pro_loc_voit,
             data.fm_pro_loc_moto,
             data.fm_pro_loc_tpu,
