@@ -10,7 +10,7 @@ readme = "README.md"
 python = "^3.10"
 fastapi = "^0.115.8"
 uvicorn = "^0.34.0"
-typo-modal = {git = "ssh://git@github.com/EPFL-ENAC/lasur-typo_modal.git", rev = "main"}
+typo-modal = {git = "https://github.com/EPFL-LASUR/mobility-toolkit.git", rev = "0.1.0"}
 pydantic-settings = "^2.8.0"
 
 

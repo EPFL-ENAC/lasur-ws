@@ -879,9 +879,9 @@ pyarrow = "^19.0.1"
 
 [package.source]
 type = "git"
-url = "ssh://git@github.com/EPFL-ENAC/lasur-typo_modal.git"
-reference = "main"
-resolved_reference = "448bf74fa285edc6d58a61cccda54f9f0cd72f8d"
+url = "https://github.com/EPFL-LASUR/mobility-toolkit.git"
+reference = "0.1.0"
+resolved_reference = "6c7d3b5c907038346f6c95d4d7731211c169a323"
 
 [[package]]
 name = "tzdata"
@@ -916,4 +916,4 @@ standard = ["colorama (>=0.4)", "httptools (>=0.6.3)", "python-dotenv (>=0.13)",
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "796dc1ef4283e11668a2e02be3802df38cf542d5f6148f00b247a00b3e0f31cb"
+content-hash = "46972e2238d473e4500448ad6317f313455d76a2f2a98f3c758003599b4d6195"
