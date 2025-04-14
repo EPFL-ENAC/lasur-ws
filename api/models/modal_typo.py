@@ -1,5 +1,5 @@
-from typing import List, Dict
-from pydantic import BaseModel
+from typing import List, Optional
+from pydantic import BaseModel, Field
 
 
 class ODData(BaseModel):
@@ -59,7 +59,7 @@ class RecoMultiData(BaseModel):
     d_lon: float
     d_lat: float
     tps_traj: int
-    constraints: List[str]
+    constraints: Optional[List[str]] = Field(default=[])
     fm_dt_voit: int
     fm_dt_moto: int
     fm_dt_tpu: int
@@ -106,22 +106,22 @@ class RecoProData(BaseModel):
 
 
 class EmplActions(BaseModel):
-    mesures_globa: List[str]
-    mesures_tpu: List[str]
-    mesures_train: List[str]
-    mesures_inter: List[str]
-    mesures_velo: List[str]
-    mesures_covoit: List[str]
-    mesures_elec: List[str]
-    mesures_pro_velo: List[str]
-    mesures_pro_tpu: List[str]
-    mesures_pro_train: List[str]
-    mesures_pro_elec: List[str]
+    mesures_globa: Optional[List[str]] = Field(default=[])
+    mesures_tpu: Optional[List[str]] = Field(default=[])
+    mesures_train: Optional[List[str]] = Field(default=[])
+    mesures_inter: Optional[List[str]] = Field(default=[])
+    mesures_velo: Optional[List[str]] = Field(default=[])
+    mesures_covoit: Optional[List[str]] = Field(default=[])
+    mesures_elec: Optional[List[str]] = Field(default=[])
+    mesures_pro_velo: Optional[List[str]] = Field(default=[])
+    mesures_pro_tpu: Optional[List[str]] = Field(default=[])
+    mesures_pro_train: Optional[List[str]] = Field(default=[])
+    mesures_pro_elec: Optional[List[str]] = Field(default=[])
 
 
 class EmplData(BaseModel):
     empl: EmplActions
-    reco_dt2: List[str]
+    reco_dt2: Optional[List[str]] = Field(default=[])
     reco_pro_loc: str
     reco_pro_reg: str
     reco_pro_int: str
