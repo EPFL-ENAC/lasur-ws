@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "api"
-version = "0.1.2"
+version = "0.2.0"
 description = "LASUR Web Services"
 authors = ["ymarcon <yannick.marcon@epfl.ch>"]
 license = "GPLv3"

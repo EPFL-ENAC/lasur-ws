@@ -1,8 +1,9 @@
-from fastapi import FastAPI, status, HTTPException
+from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 from logging import basicConfig, INFO, DEBUG
 from pydantic import BaseModel
 from .views.modal_typo import router as modal_typo_router
+from .views.auth import router as auth_router
 
 basicConfig(level=DEBUG)
 
@@ -40,6 +41,11 @@ async def get_health(
     """
     return HealthCheck(status="OK")
 
+app.include_router(
+    auth_router,
+    prefix="/auth",
+    tags=["Authentication"],
+)
 
 app.include_router(
     modal_typo_router,
