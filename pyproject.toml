@@ -7,12 +7,13 @@ license = "GPLv3"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 fastapi = "^0.115.8"
 uvicorn = "^0.34.0"
 typo-modal = {git = "https://github.com/EPFL-LASUR/mobility-toolkit.git", rev = "0.1.2"}
 pydantic-settings = "^2.8.0"
 redis = "^6.4.0"
+isochrones = {git = "https://github.com/EPFL-ENAC/isochrones.git"}
 
 
 [tool.poetry.group.dev.dependencies]
