@@ -6,6 +6,9 @@ class Config(BaseSettings):
 
     API_KEYS: str
 
+    REDIS_URL: str = "redis://localhost"
+    CACHE_OSM_EXPIRY: int = 600
+
 
 @lru_cache()
 def get_config():
