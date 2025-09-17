@@ -26,3 +26,10 @@ class FeatureCollection(BaseModel):
     type: str = "FeatureCollection"
     features: List[Feature]
     bbox: Optional[List[float]] = None
+
+
+class PoisData(BaseModel):
+    bbox: List[float] = Field(...,
+                              description="Bounding box [minLon, minLat, maxLon, maxLat]")
+    categories: Optional[List[str]] = Field(
+        None, description="List of POI categories to filter")

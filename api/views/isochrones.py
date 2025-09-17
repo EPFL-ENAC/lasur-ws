@@ -2,8 +2,8 @@ import logging
 from typing import Dict
 from fastapi import APIRouter, Security
 from ..auth import get_api_key
-from isochrones import calculate_isochrones
-from ..models.isochrones import IsochroneData, FeatureCollection
+from isochrones import calculate_isochrones, get_osm_features
+from ..models.isochrones import IsochroneData, FeatureCollection, PoisData
 from ..config import config
 from ..auth import API_KEYS
 from datetime import datetime
@@ -11,7 +11,7 @@ from datetime import datetime
 router = APIRouter()
 
 
-@router.post("/compute", response_model=FeatureCollection)
+@router.post("/compute", response_model=FeatureCollection, response_model_exclude_none=True)
 async def compute_isochrones(
     data: IsochroneData,
     api_key: str = Security(get_api_key),
@@ -36,3 +36,20 @@ async def compute_isochrones(
     except Exception as e:
         logging.error(e, exc_info=True)
         return {'error': str(e)}
+
+
+@router.post("/pois", response_model=FeatureCollection, response_model_exclude_none=True)
+async def get_pois(
+    data: PoisData,
+    api_key: str = Security(get_api_key),
+) -> FeatureCollection:
+    """Get available OSM features for isochrone calculations."""
+    tags = {}
+    for category in data.categories or []:
+        tags[category] = True
+    try:
+        features = get_osm_features(data.bbox, tags=tags, crs="EPSG:4326")
+        return features.__geo_interface__
+    except Exception as e:
+        logging.error(e, exc_info=True)
+        return FeatureCollection(type="FeatureCollection", features=[], bbox=data.bbox)
