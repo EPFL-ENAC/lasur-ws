@@ -33,3 +33,13 @@ class PoisData(BaseModel):
                               description="Bounding box [minLon, minLat, maxLon, maxLat]")
     categories: Optional[List[str]] = Field(
         None, description="List of POI categories to filter")
+
+
+class IsochronePoisData(IsochroneData):
+    categories: Optional[List[str]] = Field(
+        None, description="List of POI categories to filter")
+
+
+class IsochroneResponse(BaseModel):
+    isochrones: FeatureCollection
+    pois: Optional[FeatureCollection] = None
