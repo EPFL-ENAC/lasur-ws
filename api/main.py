@@ -4,6 +4,7 @@ from logging import basicConfig, INFO, DEBUG
 from pydantic import BaseModel
 from .views.modal_typo import router as modal_typo_router
 from .views.auth import router as auth_router
+from .views.isochrones import router as isochrones_router
 
 basicConfig(level=DEBUG)
 
@@ -51,4 +52,10 @@ app.include_router(
     modal_typo_router,
     prefix="/modal-typo",
     tags=["Modal Typology"],
+)
+
+app.include_router(
+    isochrones_router,
+    prefix="/isochrones",
+    tags=["Isochrones"],
 )

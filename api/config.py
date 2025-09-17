@@ -9,6 +9,8 @@ class Config(BaseSettings):
     REDIS_URL: str = "redis://localhost"
     CACHE_OSM_EXPIRY: int = 600
 
+    OTP_URL: str = "https://lasur-otp.epfl.ch"
+
 
 @lru_cache()
 def get_config():
