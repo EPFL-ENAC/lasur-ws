@@ -9,12 +9,283 @@ from ..config import config
 import hashlib
 import json
 
+OSM_TAGS = {
+    "amenity": [
+        "restaurant",
+        "cafe",
+        "school",
+        "fast_food",
+        "post_box",
+        "pharmacy",
+        "bar",
+        "bank",
+        "car_sharing",
+        "community_centre",
+        "theatre",
+        "social_facility",
+        "doctors",
+        "library",
+        "university",
+        "pub",
+        "post_office",
+        "college",
+        "car_rental",
+        "bbq",
+        "police",
+        "nightclub",
+        "hospital",
+        "townhall",
+        "dentist",
+        "charging_station",
+        "public_bookcase",
+        "waste_disposal",
+        "public_building",
+        "ferry_terminal",
+        "clinic",
+        "cinema",
+        "music_school",
+        "bicycle_rental",
+        "bicycle_repair_station",
+        "veterinary",
+        "arts_centre",
+        "toy_library",
+        "childcare",
+        "public_bath",
+        "events_venue",
+        "marketplace",
+        "social_centre",
+        "exhibition_centre",
+        "bus_station",
+        "concert_hall",
+        "biergarten",
+        "food_court",
+        "library_dropoff",
+        "prep_school"
+    ],
+    "healthcare": [
+        "pharmacy",
+        "doctor",
+        "alternative",
+        "physiotherapist",
+        "hospital",
+        "dentist",
+        "clinic",
+        "laboratory",
+        "podiatrist",
+        "psychotherapist",
+        "centre",
+        "audiologist",
+        "birthing_centre",
+        "blood_donation",
+        "optometrist",
+        "psychomotricist"
+    ],
+    "office": [
+        "coworking", "administrative"
+    ],
+    "public_transport": [
+        "stop_position",
+        "platform",
+        "station"
+    ],
+    "shop": [
+        "clothes",
+        "supermarket",
+        "convenience",
+        "bakery",
+        "kiosk",
+        "bicycle_rental",
+        "department_store",
+        "shoes",
+        "books",
+        "florist",
+        "dry_cleaning",
+        "optician",
+        "laundry",
+        "sports",
+        "butcher",
+        "mall",
+        "pastry",
+        "coffee",
+        "second_hand",
+        "tea",
+        "art",
+        "copyshop",
+        "medical_supply",
+        "grocery",
+
+    ],
+    "tourism": [
+        "artwork",
+        "hotel",
+        "information",
+        "attraction",
+        "museum",
+        "viewpoint",
+        "gallery",
+        "zoo",
+        "picnic_site",
+        "theme_park",
+        "camp_site",
+        "chalet",
+        "motel"
+    ],
+}
+
+CATEGORY_TAGS = {
+    "food": {
+        "amenity": [
+            "restaurant",
+            "cafe",
+            "fast_food",
+            "food_court"
+        ],
+        "shop": [
+            "supermarket",
+            "convenience",
+            "bakery",
+            "butcher",
+            "pastry"
+        ]
+    },
+    "education": {
+        "amenity": [
+            "school",
+            "library",
+            "university",
+            "college",
+            "public_bookcase",
+            "waste_disposal",
+            "toy_library",
+            "childcare",
+            "library_dropoff",
+            "prep_school",
+        ]
+    },
+    "service": {
+        "amenity": [
+            "post_box",
+            "bank",
+            "post_office",
+            "police",
+            "townhall",
+            "public_building",
+            "public_bath",
+        ],
+        "office": [
+            "coworking",
+            "administrative"
+        ],
+        "shop": [
+            "dry_cleaning",
+            "laundry",
+            "copyshop"
+        ]
+    },
+    "health": {
+        "amenity": [
+            "pharmacy",
+            "doctors",
+            "hospital",
+            "dentist",
+            "clinic",
+            "veterinary",
+        ],
+        "healthcare": [
+            "pharmacy",
+            "doctor",
+            "alternative",
+            "physiotherapist",
+            "hospital",
+            "dentist",
+            "clinic",
+            "laboratory",
+            "podiatrist",
+            "psychotherapist",
+            "centre",
+            "audiologist",
+            "birthing_centre",
+            "blood_donation",
+            "optometrist",
+            "psychomotricist"
+        ]
+    },
+    "leisure": {
+        "amenity": [
+            "bar",
+            "community_centre",
+            "theatre",
+            "social_facility",
+            "pub",
+            "bbq",
+            "nightclub",
+            "cinema",
+            "music_school",
+            "arts_centre",
+            "events_venue",
+            "social_centre",
+            "exhibition_centre",
+            "concert_hall",
+            "biergarten"
+        ],
+        "shop": ["art"],
+        "tourism": [
+            "artwork",
+            "hotel",
+            "information",
+            "attraction",
+            "museum",
+            "viewpoint",
+            "gallery",
+            "zoo",
+            "picnic_site",
+            "theme_park",
+            "camp_site",
+            "chalet",
+            "motel"
+        ]
+    },
+    "transport": {
+        "amenity": [
+            "car_sharing",
+            "car_rental",
+            "charging_station",
+            "ferry_terminal",
+            "bicycle_rental",
+            "bicycle_repair_station",
+            "bus_station",
+        ],
+        "public_transport": [
+            "stop_position",
+            "platform",
+            "station"
+        ]
+    },
+    "commerce": {
+        "amenity": ["marketplace"],
+        "shop": [
+            "clothes",
+            "kiosk",
+            "bicycle",
+            "department_store",
+            "shoes",
+            "books",
+            "florist",
+            "sports",
+            "mall",
+            "coffee",
+            "second_hand",
+            "tea",
+            "grocery"
+        ]
+    },
+}
+
 
 class PoisService:
     def __init__(self):
         self.areas = json.loads(config.CACHE_OSM_AREAS)
-        self.categories = [category.strip()
-                           for category in config.CACHE_OSM_CATEGORIES.split(",")]
+        self.categories = CATEGORY_TAGS.keys()
 
     async def get_pois(self, bbox: list[float], categories: list[str] = None, cached: bool = True) -> FeatureCollection:
         """Get available OSM features for isochrone calculations.
@@ -161,7 +432,20 @@ class PoisService:
     def _make_tags(self, categories: list[str]) -> Dict[str, bool]:
         tags = {}
         for category in categories:
-            tags[category] = True
+            if category in CATEGORY_TAGS:
+                for tag, values in CATEGORY_TAGS[category].items():
+                    if tag not in tags:
+                        tags[tag] = []
+                    for value in values:
+                        if value not in tags[tag]:
+                            tags[tag].append(value)
+            elif category in OSM_TAGS:
+                if category not in tags:
+                    tags[category] = []
+                for value in OSM_TAGS[category]:
+                    if value not in tags[category]:
+                        tags[category].append(value)
+        logging.debug(f"Using OSM tags: {tags}")
         return tags
 
     def _make_cache_key(self, bbox: list[float], category: str) -> str:

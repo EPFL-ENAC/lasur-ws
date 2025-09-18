@@ -8,7 +8,6 @@ class Config(BaseSettings):
 
     REDIS_URL: str = "redis://localhost"
     CACHE_OSM_EXPIRY: int = 3600 * 24  # 24 hours
-    CACHE_OSM_CATEGORIES: str = "amenity,healthcare,office,public_transport,shop,tourism"
     # Geneva and Leman areas by default
     CACHE_OSM_AREAS: str = "[[5.829620,46.055305,6.420135,46.425730],[6.252594,46.293045,7.027130,46.620381]]"
 
