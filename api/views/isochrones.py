@@ -1,12 +1,14 @@
 import logging
-from typing import Dict
+from typing import Dict, Optional
 from fastapi import APIRouter, Security
 from ..auth import get_api_key
-from isochrones import calculate_isochrones, get_osm_features, intersect_isochrones
+from isochrones import calculate_isochrones, intersect_isochrones
+from ..service.pois import PoisService
 from ..models.isochrones import IsochronePoisData, IsochroneResponse, FeatureCollection, PoisData
 from ..config import config
 from ..auth import API_KEYS
 from datetime import datetime
+import geopandas as gpd
 
 router = APIRouter()
 
@@ -51,12 +53,14 @@ async def compute_isochrones(
             # Fetch OSM features within the bounding box
             tags: Dict[str, bool] = {
                 category: True for category in data.categories}
-            pois = get_osm_features(bbox, tags=tags, crs="EPSG:4326")
-            if pois is None or pois.empty:
+            pois_service = PoisService()
+            pois = await pois_service.get_pois(bbox=bbox, categories=data.categories)
+            if pois is None or pois.get("features") is None or len(pois.get("features")) == 0:
                 return IsochroneResponse(isochrones=isochrones.__geo_interface__, pois=None)
 
             # Intersect isochrones with POIs
-            intersected_pois = intersect_isochrones(isochrones, pois)
+            pois_gdf = gpd.GeoDataFrame.from_features(pois)
+            intersected_pois = intersect_isochrones(isochrones, pois_gdf)
             if intersected_pois is None or intersected_pois.empty:
                 return IsochroneResponse(isochrones=isochrones.__geo_interface__, pois=None)
         except Exception as e:
@@ -75,12 +79,40 @@ async def get_pois(
     api_key: str = Security(get_api_key),
 ) -> FeatureCollection:
     """Get available OSM features for isochrone calculations."""
-    tags = {}
-    for category in data.categories or []:
-        tags[category] = True
     try:
-        features = get_osm_features(data.bbox, tags=tags, crs="EPSG:4326")
-        return features.__geo_interface__
+        pois_service = PoisService()
+        features = await pois_service.get_pois(
+            bbox=data.bbox, categories=data.categories)
+        return features
     except Exception as e:
         logging.error(e, exc_info=True)
         return FeatureCollection(type="FeatureCollection", features=[], bbox=data.bbox)
+
+
+@router.post("/pois/_cache", response_model=Dict, response_model_exclude_none=True)
+async def get_pois(
+    api_key: str = Security(get_api_key),
+) -> Dict:
+    """Get available OSM features for isochrone calculations and cache them.
+    Use default bounding box and categories from config.
+    """
+    try:
+        pois_service = PoisService()
+        count_by_category = await pois_service.make_cache()
+        return count_by_category
+    except Exception as e:
+        logging.error(e, exc_info=True)
+        return {'error': str(e)}
+
+
+@router.delete("/pois/_cache", response_model=None)
+async def delete_pois_cache(
+    api_key: str = Security(get_api_key),
+) -> None:
+    """Delete all cached OSM features."""
+    try:
+        pois_service = PoisService()
+        await pois_service.delete_cache()
+    except Exception as e:
+        logging.error(e, exc_info=True)
+        return None
