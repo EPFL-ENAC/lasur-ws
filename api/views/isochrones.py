@@ -2,7 +2,7 @@ import logging
 from typing import Dict, Optional
 from fastapi import APIRouter, Security
 from ..auth import get_api_key
-from isochrones import calculate_isochrones, intersect_isochrones
+from isochrones import calculate_isochrones, get_available_modes, intersect_isochrones
 from ..service.pois import PoisService
 from ..models.isochrones import IsochronePoisData, IsochroneResponse, FeatureCollection, PoisData
 from ..config import config
@@ -11,6 +11,15 @@ from datetime import datetime
 import geopandas as gpd
 
 router = APIRouter()
+
+
+@router.get("/modes", response_model=Dict[str, str], response_model_exclude_none=True)
+async def get_modes(api_key: str = Security(get_api_key)) -> Dict[str, str]:
+    otp_url = config.OTP_URL
+    # Use the first API key if available
+    api_key = API_KEYS[0] if API_KEYS else None
+    available_modes = get_available_modes(otp_url, api_key=api_key)
+    return available_modes
 
 
 @router.post("/compute", response_model=IsochroneResponse, response_model_exclude_none=True)
@@ -26,11 +35,12 @@ async def compute_isochrones(
     datetime_obj = datetime.fromisoformat(data.datetime)
     try:
         isochrones = calculate_isochrones(
-            data.lat,
-            data.lon,
-            data.cutoffSec,
-            datetime_obj,
-            otp_url,
+            lat=data.lat,
+            lon=data.lon,
+            cutoffSec=data.cutoffSec,
+            date_time=datetime_obj,
+            mode=data.mode if hasattr(data, 'mode') else 'WALK',
+            otp_url=otp_url,
             api_key=api_key,
             router='default',
         )

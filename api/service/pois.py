@@ -308,8 +308,10 @@ class PoisService:
                     for category in categories if categories else self.categories:
                         features = await self._make_area_category_cache(area, category)
                         if features is not None and not features.empty:
-                            all_features = pd.concat(
-                                [all_features, features], ignore_index=True)
+                            inner_features = features.cx[bbox[0]:bbox[2], bbox[1]:bbox[3]]
+                            if inner_features is not None and not inner_features.empty:
+                                all_features = pd.concat(
+                                    [all_features, inner_features], ignore_index=True)
                     return all_features.__geo_interface__
                 else:
                     logging.warning(

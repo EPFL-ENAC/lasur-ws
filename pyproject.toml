@@ -13,7 +13,7 @@ uvicorn = "^0.34.0"
 typo-modal = {git = "https://github.com/EPFL-LASUR/mobility-toolkit.git", rev = "0.1.2"}
 pydantic-settings = "^2.8.0"
 redis = "^6.4.0"
-isochrones = {git = "https://github.com/EPFL-ENAC/isochrones.git"}
+isochrones = {git = "https://github.com/EPFL-ENAC/isochrones.git", rev = "8b7a1b4395a6629c3344bf3844326c62834352c2"}
 
 
 [tool.poetry.group.dev.dependencies]
