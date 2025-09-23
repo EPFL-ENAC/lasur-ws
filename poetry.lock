@@ -262,7 +262,7 @@ files = [
 
 [[package]]
 name = "isochrones"
-version = "0.2.0"
+version = "0.3.0"
 description = "Add your description here"
 optional = false
 python-versions = ">=3.11"
@@ -282,8 +282,8 @@ example = ["contextily (>=1.6.2)", "matplotlib (>=3.10.5)", "numpy (>=2.3.2)", "
 [package.source]
 type = "git"
 url = "https://github.com/EPFL-ENAC/isochrones.git"
-reference = "8b7a1b4395a6629c3344bf3844326c62834352c2"
-resolved_reference = "8b7a1b4395a6629c3344bf3844326c62834352c2"
+reference = "3b01f036767160641548533936ede3d15527d14b"
+resolved_reference = "3b01f036767160641548533936ede3d15527d14b"
 
 [[package]]
 name = "networkx"
@@ -1128,4 +1128,4 @@ standard = ["colorama (>=0.4) ; sys_platform == \"win32\"", "httptools (>=0.6.3)
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "5f0eb5477fd1d3a70d7fe4b6be45bfdc2fb93bd48ea8b6d169211e4d7fbe7038"
+content-hash = "ed1843a60e2a9ab52777feaf76f8b6c7901aea0a1c457b8eec4cd69c59a4ae34"

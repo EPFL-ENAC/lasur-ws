@@ -8,6 +8,7 @@ class IsochroneData(BaseModel):
     cutoffSec: List[int]
     datetime: str  # ISO 8601 format
     mode: Optional[str] = "WALK"  # e.g., "WALK", "BICYCLE", "TRANSIT"
+    bikeSpeed: Optional[float] = None
 
 
 class FeatureGeometry(BaseModel):
