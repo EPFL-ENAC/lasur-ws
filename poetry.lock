@@ -1821,7 +1821,7 @@ example = ["contextily (>=1.6.2)", "matplotlib (>=3.10.5)", "numpy (>=2.3.2)", "
 [package.source]
 type = "git"
 url = "https://github.com/EPFL-ENAC/isochrones.git"
-reference = "3b01f036767160641548533936ede3d15527d14b"
+reference = "0.3.0"
 resolved_reference = "3b01f036767160641548533936ede3d15527d14b"
 
 [[package]]
@@ -6050,9 +6050,9 @@ spyder = ">=6.0.8"
 
 [package.source]
 type = "git"
-url = "https://github.com/EPFL-ENAC/lasur-mobility-toolkit.git"
-reference = "34fac081ab957a0d2d5d53488b9c4f908b7427b9"
-resolved_reference = "34fac081ab957a0d2d5d53488b9c4f908b7427b9"
+url = "https://github.com/EPFL-LASUR/mobility-toolkit.git"
+reference = "0.2.0"
+resolved_reference = "1b54f86cac6391ba658ab6c2ed64556fe4b34ef0"
 
 [[package]]
 name = "tzdata"
@@ -6458,4 +6458,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<4.0"
-content-hash = "7ed0537dcac9bfdfab3423c8d7579ac0f1bf6ffeaa6a0080114ccf18e21d1593"
+content-hash = "77f249f1100fb2787d6143385711f37368eb64ffda036023ae8848cb232b3417"
