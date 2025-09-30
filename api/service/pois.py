@@ -344,47 +344,6 @@ class PoisService:
         counts = {}
         for area in self.areas:
             features = await self._make_area_cache(area)
-            if features is None:
-                continue
-            # count rows in this pandas dataframe grouped by 'variable' column
-            area_counts = features['variable'].value_counts(
-            ).to_dict()
-            for category, count in area_counts.items():
-                counts[category] = counts.get(category, 0) + count
-        return counts
-
-    async def _make_area_cache(self, bbox: list[float]) -> GeoDataFrame | None:
-        """Get available OSM features for isochrone calculations and cache them."""
-        try:
-            all_features = GeoDataFrame()
-            for category in self.categories:
-                features = await self._make_area_category_cache(bbox, category)
-                if features is None or features.empty:
-                    continue  # No data fetched for this category
-                all_features = pd.concat(
-                    [all_features, features], ignore_index=True)
-            return all_features
-        except Exception as e:
-            logging.error(e, exc_info=True)
-            return None
-
-    async def delete_cache(self) -> None:
-        """Delete all cached OSM features."""
-        try:
-            keys = await redis.keys("pois:*")
-            if keys:
-                await redis.delete(*keys)
-                logging.info(f"Deleted {len(keys)} cache keys.")
-            else:
-                logging.info("No cache keys to delete.")
-        except Exception as e:
-            logging.error(e, exc_info=True)
-
-    async def make_cache(self) -> Dict:
-        """Get available OSM features for isochrone calculations and cache them."""
-        counts = {}
-        for area in self.areas:
-            features = await self._make_area_cache(area)
             # count rows in this pandas dataframe grouped by 'variable' column
             area_counts = features['variable'].value_counts(
             ).to_dict()
