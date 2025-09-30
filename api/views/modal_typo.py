@@ -3,11 +3,11 @@ from typing import Dict
 from fastapi import APIRouter, Security
 from ..auth import get_api_key
 from typo_modal.service import TypoModalService, load_data
-from ..models.modal_typo import ODData, TypoData, RecoData, RecoMultiData, RecoProData, EmplData
+from ..models.modal_typo import ODData, RecoMultiData2, RecoProData2, TypoData, RecoData, RecoProData, EmplData
 
 router = APIRouter()
 
-od_mm, orig_dess, dest_dess = load_data()
+od_mm, orig_dess, dest_dess, can_df = load_data()
 
 
 @router.post("/geo", response_model=Dict)
@@ -16,7 +16,7 @@ async def compute_geo(
     api_key: str = Security(get_api_key),
 ) -> Dict:
     """Compute nearest origin and destination based on the provided data."""
-    service = TypoModalService(od_mm, orig_dess, dest_dess)
+    service = TypoModalService(od_mm, orig_dess, dest_dess, can_df)
     try:
         return service.compute_geo(odData.o_lon, odData.o_lat, odData.d_lon, odData.d_lat)
     except Exception as e:
@@ -30,7 +30,7 @@ async def compute_typo(
     api_key: str = Security(get_api_key),
 ) -> Dict:
     """Compute modal typology based on the provided data."""
-    service = TypoModalService(od_mm, orig_dess, dest_dess)
+    service = TypoModalService(od_mm, orig_dess, dest_dess, can_df)
     try:
         typo = service.compute_typo(
             data.a_voit,
@@ -58,7 +58,7 @@ async def compute_reco(
     api_key: str = Security(get_api_key),
 ) -> Dict:
     """Compute modal recommendation based on the provided data."""
-    service = TypoModalService(od_mm, orig_dess, dest_dess)
+    service = TypoModalService(od_mm, orig_dess, dest_dess, can_df)
     try:
         t_traj_mm = service.compute_geo(
             data.o_lon, data.o_lat, data.d_lon, data.d_lat)
@@ -92,24 +92,19 @@ async def compute_reco(
 
 @router.post("/reco-multi", response_model=Dict)
 async def compute_reco_multi(
-    data: RecoMultiData,
+    data: RecoMultiData2,
     api_key: str = Security(get_api_key),
 ) -> Dict:
     """Compute modal recommendation based on the provided data."""
-    service = TypoModalService(od_mm, orig_dess, dest_dess)
+    service = TypoModalService(od_mm, orig_dess, dest_dess, can_df)
     try:
         t_traj_mm = service.compute_geo(
             data.o_lon, data.o_lat, data.d_lon, data.d_lat)
         reco_dt2, scores, access = service.compute_reco_multi(t_traj_mm,
                                                               data.tps_traj,
                                                               data.constraints,
-                                                              data.fm_dt_voit,
-                                                              data.fm_dt_moto,
-                                                              data.fm_dt_tpu,
-                                                              data.fm_dt_train,
-                                                              data.fm_dt_velo,
-                                                              data.fm_dt_march,
-                                                              data.fm_dt_inter,
+                                                              [journey.model_dump(
+                                                              ) for journey in data.freq_mod_journeys],
                                                               data.a_voit,
                                                               data.a_moto,
                                                               data.a_tpu,
@@ -136,7 +131,7 @@ async def compute_reco_pro(
     api_key: str = Security(get_api_key),
 ) -> Dict:
     """Compute pro modal recommendation based on the provided data."""
-    service = TypoModalService(od_mm, orig_dess, dest_dess)
+    service = TypoModalService(od_mm, orig_dess, dest_dess, can_df)
     try:
         reco_pro_loc, reco_pro_reg, reco_pro_int = service.compute_reco_pro({
             'velo': data.score_velo,
@@ -166,21 +161,43 @@ async def compute_reco_pro(
         return {'error': str(e)}
 
 
+@router.post("/reco-pro-h3", response_model=Dict)
+async def compute_reco_pro(
+    data: RecoProData2,
+    api_key: str = Security(get_api_key),
+) -> Dict:
+    """Compute pro modal recommendation based on the provided data."""
+    service = TypoModalService(od_mm, orig_dess, dest_dess, can_df)
+    try:
+        reco_pros = service.compute_reco_pro_h3({
+            'velo': data.score_velo,
+            'tpu': data.score_tpu,
+            'train': data.score_train,
+            'elec': data.score_elec
+        },
+            [journey.model_dump() for journey in data.freq_mod_pro_journeys],
+            data.d_lat,
+            data.d_lon
+        )
+        return {'reco_pros': reco_pros}
+    except Exception as e:
+        logging.error(e, exc_info=True)
+        return {'error': str(e)}
+
+
 @router.post("/empl", response_model=Dict)
 async def compute_empl_actions(
     data: EmplData,
     api_key: str = Security(get_api_key),
 ) -> Dict:
     """Compute employer actions based on the provided data."""
-    service = TypoModalService(od_mm, orig_dess, dest_dess)
+    service = TypoModalService(od_mm, orig_dess, dest_dess, can_df)
     try:
-        mesure_dt1, mesure_dt2, mesure_pro_loc, mesure_pro_regint = service.compute_mesu_empl(
+        mesure_dt1, mesure_dt2, mesure_pro = service.compute_mesu_empl(
             data.empl.model_dump(),
             data.reco_dt2,
-            data.reco_pro_loc,
-            data.reco_pro_reg,
-            data.reco_pro_int)
-        return {'mesure_dt1': mesure_dt1, 'mesure_dt2': mesure_dt2, 'mesure_pro_loc': mesure_pro_loc, 'mesure_pro_regint': mesure_pro_regint}
+            data.reco_pro)
+        return {'mesure_dt1': mesure_dt1, 'mesure_dt2': mesure_dt2, 'mesure_pro': mesure_pro}
     except Exception as e:
         logging.error(e, exc_info=True)
         return {'error': str(e)}

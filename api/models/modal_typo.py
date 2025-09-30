@@ -82,6 +82,34 @@ class RecoMultiData(BaseModel):
     i_envi: int
 
 
+class ProJourney(BaseModel):
+    modes: Optional[List[str]] = Field(default=[])
+    days: int
+
+
+class RecoMultiData2(BaseModel):
+    o_lon: float
+    o_lat: float
+    d_lon: float
+    d_lat: float
+    tps_traj: int
+    constraints: Optional[List[str]] = Field(default=[])
+    freq_mod_journeys: Optional[List[ProJourney]] = Field(default=[])
+    a_voit: int
+    a_moto: int
+    a_tpu: int
+    a_train: int
+    a_velo: int
+    a_marc: int
+    i_tmps: int
+    i_prix: int
+    i_flex: int
+    i_conf: int
+    i_fiab: int
+    i_prof: int
+    i_envi: int
+
+
 class RecoProData(BaseModel):
     score_velo: int
     score_tpu: int
@@ -105,6 +133,22 @@ class RecoProData(BaseModel):
     fm_pro_int_avio: int
 
 
+class ProJourney(BaseModel):
+    mode: str
+    days: int
+    hex_id: str
+
+
+class RecoProData2(BaseModel):
+    score_velo: int
+    score_tpu: int
+    score_train: int
+    score_elec: int
+    freq_mod_pro_journeys: Optional[List[ProJourney]] = Field(default=[])
+    d_lon: float
+    d_lat: float
+
+
 class EmplActions(BaseModel):
     mesures_globa: Optional[List[str]] = Field(default=[])
     mesures_tpu: Optional[List[str]] = Field(default=[])
@@ -122,6 +166,4 @@ class EmplActions(BaseModel):
 class EmplData(BaseModel):
     empl: EmplActions
     reco_dt2: Optional[List[str]] = Field(default=[])
-    reco_pro_loc: str
-    reco_pro_reg: str
-    reco_pro_int: str
+    reco_pro: Optional[List[str]] = Field(default=[])
