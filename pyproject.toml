@@ -1,18 +1,19 @@
-[tool.poetry]
+[project]
 name = "api"
 version = "0.2.0"
+requires-python = ">=3.11,<4.0"
+dependencies = [
+  "fastapi>=0.115.8",
+  "uvicorn>=0.34.0",
+  "pydantic-settings>=2.8.0",
+  "redis>=6.4.0",
+  "typo-modal @ git+https://github.com/EPFL-LASUR/mobility-toolkit.git@0.2.0",
+  "isochrones @ git+https://github.com/EPFL-ENAC/isochrones.git@0.3.0",
+]
 description = "LASUR Web Services"
-authors = ["ymarcon <yannick.marcon@epfl.ch>"]
+authors = [{ name = "Yannick Marcon", email = "yannick.marcon@epfl.ch" }]
 license = "GPLv3"
 readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.10"
-fastapi = "^0.115.8"
-uvicorn = "^0.34.0"
-typo-modal = {git = "https://github.com/EPFL-LASUR/mobility-toolkit.git", rev = "0.1.2"}
-pydantic-settings = "^2.8.0"
-
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
