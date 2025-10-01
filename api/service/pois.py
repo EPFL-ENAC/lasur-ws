@@ -344,6 +344,9 @@ class PoisService:
         counts = {}
         for area in self.areas:
             features = await self._make_area_cache(area)
+            # filter features having a 'variable' column
+            if features is None or features.empty or 'variable' not in features.columns:
+                continue  # No data fetched for this area
             # count rows in this pandas dataframe grouped by 'variable' column
             area_counts = features['variable'].value_counts(
             ).to_dict()
