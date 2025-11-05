@@ -44,6 +44,8 @@ class PoisData(BaseModel):
 class IsochronePoisData(IsochroneData):
     categories: Optional[List[str]] = Field(
         None, description="List of POI categories to filter")
+    overlap: Optional[bool] = Field(
+        True, description="Whether to return overlapping isochrones or non-overlapping ones")
 
 
 class IsochroneResponse(BaseModel):
