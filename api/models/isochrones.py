@@ -35,11 +35,17 @@ class PoisData(BaseModel):
                               description="Bounding box [minLon, minLat, maxLon, maxLat]")
     categories: Optional[List[str]] = Field(
         None, description="List of POI categories to filter")
+    source: Optional[str] = Field(
+        None, description="Source of POI data (e.g., 'osm.pbf')")
+    cached: Optional[bool] = Field(
+        False, description="Whether to use cached POI data if available")
 
 
 class IsochronePoisData(IsochroneData):
     categories: Optional[List[str]] = Field(
         None, description="List of POI categories to filter")
+    overlap: Optional[bool] = Field(
+        True, description="Whether to return overlapping isochrones or non-overlapping ones")
 
 
 class IsochroneResponse(BaseModel):

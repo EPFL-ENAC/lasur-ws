@@ -44,6 +44,7 @@ async def compute_isochrones(
             api_key=api_key,
             bike_speed=data.bikeSpeed if hasattr(data, 'bikeSpeed') else 13.0,
             router='default',
+            overlap=data.overlap,
         )
         if data.categories is None or len(data.categories) == 0:
             return IsochroneResponse(isochrones=isochrones.__geo_interface__, pois=None)
@@ -93,7 +94,11 @@ async def get_pois(
     try:
         pois_service = PoisService()
         features = await pois_service.get_pois(
-            bbox=data.bbox, categories=data.categories)
+            bbox=data.bbox,
+            categories=data.categories,
+            source=data.source,
+            cached=data.cached
+        )
         return features
     except Exception as e:
         logging.error(e, exc_info=True)
