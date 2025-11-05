@@ -44,7 +44,7 @@ async def compute_isochrones(
             api_key=api_key,
             bike_speed=data.bikeSpeed if hasattr(data, 'bikeSpeed') else 13.0,
             router='default',
-            overlap=data.overlap if hasattr(data, 'overlap') else True,
+            overlap=data.overlap,
         )
         if data.categories is None or len(data.categories) == 0:
             return IsochroneResponse(isochrones=isochrones.__geo_interface__, pois=None)
@@ -88,7 +88,7 @@ async def compute_isochrones(
 @router.post("/pois", response_model=FeatureCollection, response_model_exclude_none=True)
 async def get_pois(
     data: PoisData,
-    # api_key: str = Security(get_api_key),
+    api_key: str = Security(get_api_key),
 ) -> FeatureCollection:
     """Get available OSM features for isochrone calculations."""
     try:
@@ -96,8 +96,8 @@ async def get_pois(
         features = await pois_service.get_pois(
             bbox=data.bbox,
             categories=data.categories,
-            source=data.source if hasattr(data, 'source') else None,
-            cached=data.cached if hasattr(data, 'cached') else False
+            source=data.source,
+            cached=data.cached
         )
         return features
     except Exception as e:
