@@ -1801,7 +1801,7 @@ test-extra = ["curio", "ipython[test]", "jupyter_ai", "matplotlib (!=3.2.0)", "n
 
 [[package]]
 name = "isochrones"
-version = "0.3.1"
+version = "0.4.1"
 description = "Add your description here"
 optional = false
 python-versions = ">=3.11"
@@ -1812,6 +1812,7 @@ develop = false
 [package.dependencies]
 geopandas = ">=1.1.1"
 osmnx = ">=2.0.6"
+pyogrio = ">=0.11.1"
 requests = ">=2.32.4"
 
 [package.extras]
@@ -1821,8 +1822,8 @@ example = ["contextily (>=1.6.2)", "matplotlib (>=3.10.5)", "numpy (>=2.3.2)", "
 [package.source]
 type = "git"
 url = "https://github.com/EPFL-ENAC/isochrones.git"
-reference = "0.3.1"
-resolved_reference = "25a3f4eb1ac0bd6c7597264a0d8d83d7a37b4d95"
+reference = "0.4.1"
+resolved_reference = "3f95f1fc9ac429320e5a20fdfd07197a6d138996"
 
 [[package]]
 name = "isort"
@@ -6451,4 +6452,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<4.0"
-content-hash = "77c5d97bd973e033c7aea3448e0d7571a86f96c7f02ccfb31522206e54bee685"
+content-hash = "0a44c3f2e1984316657661b920814179c478268b00f77c98cc41c455b555fbb7"

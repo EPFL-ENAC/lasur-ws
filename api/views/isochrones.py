@@ -87,13 +87,17 @@ async def compute_isochrones(
 @router.post("/pois", response_model=FeatureCollection, response_model_exclude_none=True)
 async def get_pois(
     data: PoisData,
-    api_key: str = Security(get_api_key),
+    # api_key: str = Security(get_api_key),
 ) -> FeatureCollection:
     """Get available OSM features for isochrone calculations."""
     try:
         pois_service = PoisService()
         features = await pois_service.get_pois(
-            bbox=data.bbox, categories=data.categories)
+            bbox=data.bbox,
+            categories=data.categories,
+            source=data.source,
+            cached=data.cached
+        )
         return features
     except Exception as e:
         logging.error(e, exc_info=True)

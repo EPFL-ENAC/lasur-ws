@@ -8,7 +8,7 @@ dependencies = [
   "pydantic-settings>=2.8.0",
   "redis>=6.4.0",
   "typo-modal @ git+https://github.com/EPFL-LASUR/mobility-toolkit.git@0.2.2",
-  "isochrones @ git+https://github.com/EPFL-ENAC/isochrones.git@0.3.1",
+  "isochrones @ git+https://github.com/EPFL-ENAC/isochrones.git@0.4.1",
 ]
 description = "LASUR Web Services"
 authors = [{ name = "Yannick Marcon", email = "yannick.marcon@epfl.ch" }]
