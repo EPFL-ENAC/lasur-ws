@@ -43,7 +43,7 @@ async def compute_isochrones(
             otp_url=otp_url,
             api_key=api_key,
             bike_speed=data.bikeSpeed if hasattr(data, 'bikeSpeed') else 13.0,
-            router='default',
+            router=data.router if hasattr(data, 'router') else 'default',
             overlap=data.overlap,
         )
         if data.categories is None or len(data.categories) == 0:

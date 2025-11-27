@@ -9,6 +9,7 @@ class IsochroneData(BaseModel):
     datetime: str  # ISO 8601 format
     mode: Optional[str] = "WALK"  # e.g., "WALK", "BICYCLE", "TRANSIT"
     bikeSpeed: Optional[float] = None
+    router: Optional[str] = "default"
 
 
 class FeatureGeometry(BaseModel):
