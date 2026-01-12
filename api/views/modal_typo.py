@@ -84,7 +84,7 @@ async def compute_reco(
                                                   data.i_fiab,
                                                   data.i_prof,
                                                   data.i_envi)
-        return {'reco_dt': reco_dt, 'scores': scores}
+        return {'reco_dt': reco_dt, 'scores': scores, 't_traj_mm': t_traj_mm}
     except Exception as e:
         logging.error(e, exc_info=True)
         return {'error': str(e)}
@@ -119,7 +119,7 @@ async def compute_reco_multi(
                                                               data.i_prof,
                                                               data.i_envi
                                                               )
-        return {'reco_dt2': reco_dt2, 'scores': scores, 'access': access}
+        return {'reco_dt2': reco_dt2, 'scores': scores, 'access': access, 't_traj_mm': t_traj_mm}
     except Exception as e:
         logging.error(e, exc_info=True)
         return {'error': str(e)}
