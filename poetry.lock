@@ -6044,7 +6044,7 @@ spyder = ">=6.0.8"
 
 [package.source]
 type = "git"
-url = "https://github.com/EPFL-LASUR/mobility-toolkit.git"
+url = "ssh://git@github.com/EPFL-LASUR/mobility-toolkit.git"
 reference = "0.2.2"
 resolved_reference = "c9ec3ce66f7ba64c5ea5c21fdfddcdb192a32230"
 
@@ -6452,4 +6452,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<4.0"
-content-hash = "0a44c3f2e1984316657661b920814179c478268b00f77c98cc41c455b555fbb7"
+content-hash = "67e82260bf3fafc5bd102f43f79de2f88ed8554cfcdd82d288972c7331139686"
