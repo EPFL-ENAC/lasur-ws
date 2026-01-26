@@ -1,13 +1,13 @@
 [project]
 name = "api"
-version = "0.4.0"
+version = "0.4.1"
 requires-python = ">=3.11,<4.0"
 dependencies = [
   "fastapi>=0.115.8",
   "uvicorn>=0.34.0",
   "pydantic-settings>=2.8.0",
   "redis>=6.4.0",
-  "typo-modal @ git+ssh://git@github.com/EPFL-LASUR/mobility-toolkit.git@0.2.2",
+  "typo-modal @ git+ssh://git@github.com/EPFL-LASUR/mobility-toolkit.git@0.2.3",
   "isochrones @ git+https://github.com/EPFL-ENAC/isochrones.git@0.4.1",
 ]
 description = "LASUR Web Services"

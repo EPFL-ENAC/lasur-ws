@@ -6024,7 +6024,7 @@ typing-extensions = ">=4.12.0"
 
 [[package]]
 name = "typo-modal"
-version = "0.2.2"
+version = "0.2.3"
 description = ""
 optional = false
 python-versions = ">=3.10,<4.0"
@@ -6045,8 +6045,8 @@ spyder = ">=6.0.8"
 [package.source]
 type = "git"
 url = "ssh://git@github.com/EPFL-LASUR/mobility-toolkit.git"
-reference = "0.2.2"
-resolved_reference = "c9ec3ce66f7ba64c5ea5c21fdfddcdb192a32230"
+reference = "0.2.3"
+resolved_reference = "9f7ee8c3487469ff0bbd6e050b769ef80a82ef07"
 
 [[package]]
 name = "tzdata"
@@ -6452,4 +6452,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<4.0"
-content-hash = "67e82260bf3fafc5bd102f43f79de2f88ed8554cfcdd82d288972c7331139686"
+content-hash = "8d9cef1981fd5207277ac163b5217baf3f2896399d0099fc24c8bd8edf9f304d"
