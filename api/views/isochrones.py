@@ -1,14 +1,17 @@
 import logging
-from typing import Dict, Optional
+from typing import Dict
+from datetime import datetime
+import geopandas as gpd
 from fastapi import APIRouter, Security
+
+from isochrones import calculate_isochrones, get_available_modes
+
+from ..utils.isochrones import get_pois_within_isochrones
 from ..auth import get_api_key
-from isochrones import calculate_isochrones, get_available_modes, intersect_isochrones
 from ..service.pois import PoisService
 from ..models.isochrones import IsochronePoisData, IsochroneResponse, FeatureCollection, PoisData
 from ..config import config
 from ..auth import API_KEYS
-from datetime import datetime
-import geopandas as gpd
 
 router = APIRouter()
 
@@ -50,7 +53,7 @@ async def compute_isochrones(
             return IsochroneResponse(isochrones=isochrones.__geo_interface__, pois=None)
 
         # Calculate bounding box from isochrones
-        if "bbox" in isochrones.__geo_interface__:
+        """ if "bbox" in isochrones.__geo_interface__:
             bbox = isochrones.__geo_interface__["bbox"]
         else:
             all_coords = [feature.geometry['coordinates']
@@ -59,27 +62,24 @@ async def compute_isochrones(
                 coords if isinstance(coords[0], list) else [coords])]
             lats = [coord[1] for coords in all_coords for coord in (
                 coords if isinstance(coords[0], list) else [coords])]
-            bbox = [min(lons), min(lats), max(lons), max(lats)]
-
+            bbox = [min(lons), min(lats), max(lons), max(lats)] """
+        
         try:
             # Fetch OSM features within the bounding box
-            tags: Dict[str, bool] = {
-                category: True for category in data.categories}
-            pois_service = PoisService()
-            pois = await pois_service.get_pois(bbox=bbox, categories=data.categories)
-            if pois is None or pois.get("features") is None or len(pois.get("features")) == 0:
-                return IsochroneResponse(isochrones=isochrones.__geo_interface__, pois=None)
+            # tags: Dict[str, bool] = { category: True for category in data.categories } // Doesn't seem to be used, can this be removed?
 
-            # Intersect isochrones with POIs
-            pois_gdf = gpd.GeoDataFrame.from_features(pois)
-            intersected_pois = intersect_isochrones(isochrones, pois_gdf)
-            if intersected_pois is None or intersected_pois.empty:
+            pois_service = PoisService()
+
+            pois_within = await get_pois_within_isochrones(isochrones, data.categories, pois_service)
+            if pois_within is None:
                 return IsochroneResponse(isochrones=isochrones.__geo_interface__, pois=None)
+            
         except Exception as e:
             logging.error(e, exc_info=True)
             return IsochroneResponse(isochrones=isochrones.__geo_interface__, pois=None)
 
-        return IsochroneResponse(isochrones=isochrones.__geo_interface__, pois=intersected_pois.__geo_interface__)
+        # TODO : cache this response in redis for 1-24 hours so that we can make the platyp admin load the recurrent ones faster ?
+        return IsochroneResponse(isochrones=isochrones.__geo_interface__, pois=pois_within.__geo_interface__)
     except Exception as e:
         logging.error(e, exc_info=True)
         return IsochroneResponse(isochrones=FeatureCollection(type="FeatureCollection", features=[]), pois=None)
