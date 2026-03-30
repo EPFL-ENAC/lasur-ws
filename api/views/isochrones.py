@@ -1,12 +1,13 @@
+import json
 import logging
 from typing import Dict
 from datetime import datetime
-import geopandas as gpd
 from fastapi import APIRouter, Security
 
 from isochrones import calculate_isochrones, get_available_modes
 
-from ..utils.isochrones import get_pois_within_isochrones
+from ..utils.sanitize import sanitize_df, gdf_geo_interface_or_none
+from ..utils.isochrones import get_pois_within_isochrones, get_transit_within_isochrones
 from ..auth import get_api_key
 from ..service.pois import PoisService
 from ..models.isochrones import IsochronePoisData, IsochroneResponse, FeatureCollection, PoisData
@@ -49,37 +50,25 @@ async def compute_isochrones(
             router=data.router if hasattr(data, 'router') else 'default',
             overlap=data.overlap,
         )
-        if data.categories is None or len(data.categories) == 0:
-            return IsochroneResponse(isochrones=isochrones.__geo_interface__, pois=None)
 
-        # Calculate bounding box from isochrones
-        """ if "bbox" in isochrones.__geo_interface__:
-            bbox = isochrones.__geo_interface__["bbox"]
-        else:
-            all_coords = [feature.geometry['coordinates']
-                          for feature in isochrones.features]
-            lons = [coord[0] for coords in all_coords for coord in (
-                coords if isinstance(coords[0], list) else [coords])]
-            lats = [coord[1] for coords in all_coords for coord in (
-                coords if isinstance(coords[0], list) else [coords])]
-            bbox = [min(lons), min(lats), max(lons), max(lats)] """
-        
-        try:
-            # Fetch OSM features within the bounding box
-            # tags: Dict[str, bool] = { category: True for category in data.categories } // Doesn't seem to be used, can this be removed?
+        pois = None
 
-            pois_service = PoisService()
+        if data.categories is not None and len(data.categories) > 0:
+            try:
+                pois_service = PoisService()
+                pois = await get_pois_within_isochrones(isochrones, data.categories, pois_service)
+            except Exception as e:
+                logging.error(e, exc_info=True)
 
-            pois_within = await get_pois_within_isochrones(isochrones, data.categories, pois_service)
-            if pois_within is None:
-                return IsochroneResponse(isochrones=isochrones.__geo_interface__, pois=None)
-            
-        except Exception as e:
-            logging.error(e, exc_info=True)
-            return IsochroneResponse(isochrones=isochrones.__geo_interface__, pois=None)
+        transit = get_transit_within_isochrones(isochrones)
+        transit_dict = json.loads(sanitize_df(transit).to_json())
 
-        # TODO : cache this response in redis for 1-24 hours so that we can make the platyp admin load the recurrent ones faster ?
-        return IsochroneResponse(isochrones=isochrones.__geo_interface__, pois=pois_within.__geo_interface__)
+        return IsochroneResponse(
+            isochrones=isochrones.__geo_interface__,
+            pois=gdf_geo_interface_or_none(pois),
+            transit=transit_dict
+        )
+
     except Exception as e:
         logging.error(e, exc_info=True)
         return IsochroneResponse(isochrones=FeatureCollection(type="FeatureCollection", features=[]), pois=None)

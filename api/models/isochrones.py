@@ -1,4 +1,5 @@
 from typing import List, Dict, Any, Optional
+import numpy as np
 from pydantic import BaseModel, Field
 
 
@@ -52,3 +53,4 @@ class IsochronePoisData(IsochroneData):
 class IsochroneResponse(BaseModel):
     isochrones: FeatureCollection
     pois: Optional[FeatureCollection] = None
+    transit: Optional[FeatureCollection] = None

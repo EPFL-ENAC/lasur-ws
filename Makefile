@@ -21,3 +21,7 @@ redis-stop:
 
 redis-down:
 	docker compose down redis
+
+get-data:
+	chmod +x ./scripts/generate_data.sh
+	./scripts/generate_data.sh

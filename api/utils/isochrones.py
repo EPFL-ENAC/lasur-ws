@@ -1,9 +1,9 @@
 import geopandas as gpd
-from isochrones import intersect_isochrones
+from api.utils.osm import DEFAULT_AREA
+from isochrones import intersect_isochrones, filter_routes_by_isochrone
 
 from ..service.pois import PoisService
 
-# TODO : this should probably be moved to the isochrones package itself
 def get_isochrones_bbox(isochrones: gpd.GeoDataFrame) -> list[float]:
         """Calculate the bounding box of the isochrones GeoDataFrame."""
         if "bbox" in isochrones.__geo_interface__:
@@ -39,3 +39,18 @@ async def get_pois_within_isochrones(isochrones: gpd.GeoDataFrame, categories: l
         return None
     
     return intersected_pois
+
+
+def get_transit_within_isochrones(isochrone: gpd.GeoDataFrame, area: str | None = None) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
+    """Fetch transit routes and stops within the bounding box of the isochrones and intersect them with the isochrones."""
+    from .osm import get_transit_routes, get_transit_stops
+
+    area = area or DEFAULT_AREA
+
+    stops = get_transit_stops(area)
+    routes = get_transit_routes(area)
+
+    # Filter transit data by the isochrone bounding box
+    filtered_routes, stops_in_filtered_routes = filter_routes_by_isochrone(routes=routes, stops=stops, isochrone=isochrone)
+
+    return filtered_routes, stops_in_filtered_routes

@@ -1,8 +1,25 @@
-FROM python:3.11.13-trixie
+FROM python:3.11.13-slim-bookworm
 
-ENV POETRY_VERSION=2.1.3
+# 1. Environment variables
+ENV POETRY_VERSION=2.1.3 \
+    PYTHONPATH="/app" \
+    PYTHONUNBUFFERED=1
+
+# 2. Install System Dependencies (This layer changes rarely)
+RUN apt-get update && apt-get install -y \
+    git \
+    cmake \
+    make \
+    g++ \
+    libpq-dev \
+    mesa-utils \
+    libgdal-dev \
+    osmium-tool \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+# 3. Install Poetry
 RUN pip install "poetry==$POETRY_VERSION"
-ENV PYTHONPATH="/app"
 
 # Add build argument for SSH key
 ARG SSH_PRIVATE_KEY
@@ -11,6 +28,8 @@ ENV PRIVATE_PACKAGES="typo_modal"
 
 WORKDIR /app
 
+# 4. Copy ONLY dependency files first
+# This ensures that editing your source code doesn't trigger a full 'poetry install'
 COPY poetry.lock pyproject.toml /app/
 
 RUN \

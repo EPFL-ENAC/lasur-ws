@@ -2,7 +2,8 @@ import logging
 from typing import Dict
 import pandas as pd
 from geopandas import GeoDataFrame
-from isochrones import get_osm_features
+from api.utils.osm import get_osm_path
+from extractosm.pois import get_osm_features
 from ..cache import redis
 from ..models.isochrones import FeatureCollection
 from ..config import config
@@ -330,8 +331,9 @@ class PoisService:
                 tags=self._make_tags(
                     categories if categories else self.categories),
                 crs="EPSG:4326",
-                osm_pbf_path=source
+                osm_pbf_path=get_osm_path(source)
             )
+
             return features.__geo_interface__
         except Exception as e:
             logging.error(e, exc_info=True)
