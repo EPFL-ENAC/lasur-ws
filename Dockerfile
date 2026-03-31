@@ -8,6 +8,7 @@ ENV POETRY_VERSION=2.1.3 \
 # 2. Install System Dependencies (This layer changes rarely)
 RUN apt-get update && apt-get install -y \
     git \
+    git-lfs \
     openssh-client \
     cmake \
     make \
@@ -41,7 +42,7 @@ RUN \
     # Accept host keys automatically
     echo "StrictHostKeyChecking no" >> /root/.ssh/config && \
     # Install system packages
-    apt-get install -y git cmake make g++ libpq-dev mesa-utils libgdal-dev && \
+    apt-get install -y git cmake make g++ libpq-dev mesa-utils libgdal-dev git-lfs && \
     # Poetry config
     poetry config installer.max-workers 10 && \
     poetry config virtualenvs.create false && \
@@ -62,8 +63,29 @@ RUN \
         fi \
     done
 
+
+# Likely temporary: clone the repo itself to get the data from lfs.
+# THIS NEEDS THE DEV TO PROCESS THE DATA WITH `make get-data` LOCALLY FIRST, THEN COMMIT THE LFS POINTERS TO THE REPO.
+# Otherwise, this image will potentially use outdated data.
+ARG DATA_REPO_URL="git@github.com:EPFL-ENAC/lasur-ws.git"
+ARG DATA_REPO_BRANCH="feat/transit-lines-stops-cache"
+ENV DATA_FOLDER="data"
+RUN mkdir -p /root/.ssh && \
+    echo "${SSH_PRIVATE_KEY}" | base64 -d > /root/.ssh/id_ed25519 && \
+    chmod 600 /root/.ssh/id_ed25519 && \
+    echo "StrictHostKeyChecking no" >> /root/.ssh/config && \
+    GIT_LFS_SKIP_SMUDGE=1 git clone \
+        --depth 1 \
+        --branch ${DATA_REPO_BRANCH} \
+        ${DATA_REPO_URL} /tmp/data_repo && \
+    mv /tmp/data_repo/${DATA_FOLDER} /app/${DATA_FOLDER} && \
+    rm -rf /tmp/data_repo && \
+    rm -rf /root/.ssh/
+
+
 COPY start.sh /app/
 COPY api /app/api
 COPY scripts /app/scripts
 
-ENTRYPOINT ["sh", "start.sh"]
+RUN chmod +x /app/start.sh
+ENTRYPOINT ["/bin/sh", "-c", "/app/start.sh data"]
