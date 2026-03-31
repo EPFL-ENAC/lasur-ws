@@ -8,6 +8,7 @@ ENV POETRY_VERSION=2.1.3 \
 # 2. Install System Dependencies (This layer changes rarely)
 RUN apt-get update && apt-get install -y \
     git \
+    openssh-client \
     cmake \
     make \
     g++ \
@@ -34,7 +35,6 @@ COPY poetry.lock pyproject.toml /app/
 
 RUN \
     # Set up SSH
-    apt-get update && apt-get install -y openssh-client git && \
     mkdir -p /root/.ssh && \
     echo "${SSH_PRIVATE_KEY}" | base64 -d > /root/.ssh/id_ed25519 && \
     chmod 600 /root/.ssh/id_ed25519 && \
@@ -64,5 +64,6 @@ RUN \
 
 COPY start.sh /app/
 COPY api /app/api
+COPY scripts /app/scripts
 
 ENTRYPOINT ["sh", "start.sh"]
