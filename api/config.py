@@ -14,6 +14,10 @@ class Config(BaseSettings):
 
     OTP_URL: str = "https://lasur-otp.epfl.ch"
 
+    LFS_USERNAME: str = "" # only used on build
+    LFS_PASSWORD: str = "" # only used on build
+    LFS_SERVER_PATH: str = "" # only used on build
+
 
 @lru_cache()
 def get_config():
