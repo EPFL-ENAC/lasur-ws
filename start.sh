@@ -1,4 +1,3 @@
-echo "$1"
 ./scripts/download_from_lfs_oid.sh "$1"
 
 # Run migrations
