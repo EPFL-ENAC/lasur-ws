@@ -26,7 +26,8 @@ def main():
         output_folder = pathlib.Path(args.output_dir)
     else:
         output_folder = input_file.parent / input_file.stem.replace(".osm", "")
-        os.makedirs(output_folder, exist_ok=True)
+    
+    os.makedirs(output_folder, exist_ok=True)
 
     print(f"Input:  {input_file}")
     print(f"Output folder: {output_folder}")

@@ -288,14 +288,14 @@ class PoisService:
         self.areas = json.loads(config.CACHE_OSM_AREAS)
         self.categories = CATEGORY_TAGS.keys()
 
-    async def get_pois(self, bbox: list[float], categories: list[str] = None, source: str = None, cached: bool = False) -> FeatureCollection:
+    async def get_pois(self, bbox: list[float], categories: list[str] = None, area: str = None, cached: bool = False) -> FeatureCollection:
         """Get available OSM features for isochrone calculations.
         If no bbox or categories are provided, use default from config.
 
         Args:
             bbox (list[float]): Bounding box [min_lon, min_lat, max_lon, max_lat].
             categories (list[str], optional): List of OSM categories. Defaults to None.
-            source (str, optional): Source of POI data (e.g., 'osm.pbf'). Defaults to None.
+            area (str, optional): Area to get the data from. Defaults to None, which is going to direct to DEFAULT_AREA.
             cached (bool, optional): Whether to use cached data. Defaults to False.
 
         Returns:
@@ -308,7 +308,7 @@ class PoisService:
                     # get cached data for each category and concatenate them
                     all_features = GeoDataFrame()
                     for category in categories if categories else self.categories:
-                        features = await self._make_area_category_cache(area, category, source)
+                        features = await self._make_area_category_cache(area, category, area)
                         if features is not None and not features.empty:
                             inner_features = features.cx[bbox[0]
                                 :bbox[2], bbox[1]:bbox[3]]
@@ -331,7 +331,7 @@ class PoisService:
                 tags=self._make_tags(
                     categories if categories else self.categories),
                 crs="EPSG:4326",
-                osm_pbf_path=get_osm_path(source)
+                osm_pbf_path=get_osm_path(area)
             )
 
             return features.__geo_interface__
@@ -366,12 +366,12 @@ class PoisService:
                 counts[category] = counts.get(category, 0) + count
         return counts
 
-    async def _make_area_cache(self, bbox: list[float], source: str | None) -> GeoDataFrame | None:
+    async def _make_area_cache(self, bbox: list[float], area: str | None) -> GeoDataFrame | None:
         """Get available OSM features for isochrone calculations and cache them."""
         try:
             all_features = GeoDataFrame()
             for category in self.categories:
-                features = await self._make_area_category_cache(bbox, category, source=source)
+                features = await self._make_area_category_cache(bbox, category, area=area)
                 if features is None or features.empty:
                     continue  # No data fetched for this category
                 all_features = pd.concat(
@@ -381,7 +381,7 @@ class PoisService:
             logging.error(e, exc_info=True)
             return None
 
-    async def _make_area_category_cache(self, bbox: list[float], category: str, source: str | None) -> GeoDataFrame | None:
+    async def _make_area_category_cache(self, bbox: list[float], category: str, area: str | None) -> GeoDataFrame | None:
         """Get available OSM features for a specific category and cache them."""
         try:
             cache_key = self._make_cache_key(bbox, category)
@@ -392,17 +392,24 @@ class PoisService:
                 # json string to dict
                 cached_data = json.loads(cached_data_json_str)
                 return GeoDataFrame.from_features(cached_data)
+            
             logging.info(f"Cache miss for key: {cache_key}. Fetching data...")
             features = get_osm_features(
                 bounding_box=tuple(bbox),
                 tags=self._make_tags([category]),
                 crs="EPSG:4326",
-                osm_pbf_path=source)
+                osm_pbf_path=get_osm_path(area)
+            )
             if features is None or features.empty:
                 return None  # No data fetched for this category
+            
             # Store the fetched data in the cache with an expiry time
-            await redis.set(cache_key,
-                            features.to_json(), ex=config.CACHE_OSM_EXPIRY)
+            await redis.set(
+                cache_key,
+                features.to_json(),
+                ex=config.CACHE_OSM_EXPIRY
+            )
+
             return features
         except Exception as e:
             logging.error(e, exc_info=True)

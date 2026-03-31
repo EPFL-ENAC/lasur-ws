@@ -41,8 +41,6 @@ RUN \
     chmod 600 /root/.ssh/id_ed25519 && \
     # Accept host keys automatically
     echo "StrictHostKeyChecking no" >> /root/.ssh/config && \
-    # Install system packages
-    apt-get install -y git cmake make g++ libpq-dev mesa-utils libgdal-dev git-lfs && \
     # Poetry config
     poetry config installer.max-workers 10 && \
     poetry config virtualenvs.create false && \
@@ -68,7 +66,7 @@ RUN \
 # THIS NEEDS THE DEV TO PROCESS THE DATA WITH `make get-data` LOCALLY FIRST, THEN COMMIT THE LFS POINTERS TO THE REPO.
 # Otherwise, this image will potentially use outdated data.
 ARG DATA_REPO_URL="git@github.com:EPFL-ENAC/lasur-ws.git"
-ARG DATA_REPO_BRANCH="feat/transit-lines-stops-cache"
+ARG DATA_REPO_BRANCH="dev"
 ENV DATA_FOLDER="data"
 RUN mkdir -p /root/.ssh && \
     echo "${SSH_PRIVATE_KEY}" | base64 -d > /root/.ssh/id_ed25519 && \

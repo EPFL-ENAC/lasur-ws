@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 # Configuration
 # vars from env file
 LFS_SERVER_URL="https://$LFS_USERNAME:$LFS_PASSWORD@$LFS_SERVER_PATH"
