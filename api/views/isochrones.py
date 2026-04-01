@@ -1,14 +1,18 @@
+import json
 import logging
-from typing import Dict, Optional
+from typing import Dict
+from datetime import datetime
 from fastapi import APIRouter, Security
+
+from isochrones import calculate_isochrones, get_available_modes
+
+from ..utils.sanitize import sanitize_df, gdf_geo_interface_or_none
+from ..utils.isochrones import get_pois_within_isochrones, get_transit_within_isochrones
 from ..auth import get_api_key
-from isochrones import calculate_isochrones, get_available_modes, intersect_isochrones
 from ..service.pois import PoisService
 from ..models.isochrones import IsochronePoisData, IsochroneResponse, FeatureCollection, PoisData
 from ..config import config
 from ..auth import API_KEYS
-from datetime import datetime
-import geopandas as gpd
 
 router = APIRouter()
 
@@ -46,40 +50,25 @@ async def compute_isochrones(
             router=data.router if hasattr(data, 'router') else 'default',
             overlap=data.overlap,
         )
-        if data.categories is None or len(data.categories) == 0:
-            return IsochroneResponse(isochrones=isochrones.__geo_interface__, pois=None)
 
-        # Calculate bounding box from isochrones
-        if "bbox" in isochrones.__geo_interface__:
-            bbox = isochrones.__geo_interface__["bbox"]
-        else:
-            all_coords = [feature.geometry['coordinates']
-                          for feature in isochrones.features]
-            lons = [coord[0] for coords in all_coords for coord in (
-                coords if isinstance(coords[0], list) else [coords])]
-            lats = [coord[1] for coords in all_coords for coord in (
-                coords if isinstance(coords[0], list) else [coords])]
-            bbox = [min(lons), min(lats), max(lons), max(lats)]
+        pois = None
 
-        try:
-            # Fetch OSM features within the bounding box
-            tags: Dict[str, bool] = {
-                category: True for category in data.categories}
-            pois_service = PoisService()
-            pois = await pois_service.get_pois(bbox=bbox, categories=data.categories)
-            if pois is None or pois.get("features") is None or len(pois.get("features")) == 0:
-                return IsochroneResponse(isochrones=isochrones.__geo_interface__, pois=None)
+        if data.categories is not None and len(data.categories) > 0:
+            try:
+                pois_service = PoisService()
+                pois = await get_pois_within_isochrones(isochrones, data.categories, pois_service)
+            except Exception as e:
+                logging.error(e, exc_info=True)
 
-            # Intersect isochrones with POIs
-            pois_gdf = gpd.GeoDataFrame.from_features(pois)
-            intersected_pois = intersect_isochrones(isochrones, pois_gdf)
-            if intersected_pois is None or intersected_pois.empty:
-                return IsochroneResponse(isochrones=isochrones.__geo_interface__, pois=None)
-        except Exception as e:
-            logging.error(e, exc_info=True)
-            return IsochroneResponse(isochrones=isochrones.__geo_interface__, pois=None)
+        filtered_routes, stops_in_filtered_routes = get_transit_within_isochrones(isochrones)
+        transit_dict = json.loads(sanitize_df(filtered_routes).to_json())
 
-        return IsochroneResponse(isochrones=isochrones.__geo_interface__, pois=intersected_pois.__geo_interface__)
+        return IsochroneResponse(
+            isochrones=isochrones.__geo_interface__,
+            pois=gdf_geo_interface_or_none(pois),
+            transit=transit_dict
+        )
+
     except Exception as e:
         logging.error(e, exc_info=True)
         return IsochroneResponse(isochrones=FeatureCollection(type="FeatureCollection", features=[]), pois=None)

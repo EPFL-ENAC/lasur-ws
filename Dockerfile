@@ -1,8 +1,27 @@
-FROM python:3.11.13-trixie
+FROM python:3.11.13-slim-bookworm
 
-ENV POETRY_VERSION=2.1.3
+# 1. Environment variables
+ENV POETRY_VERSION=2.1.3 \
+    PYTHONPATH="/app" \
+    PYTHONUNBUFFERED=1
+
+# 2. Install System Dependencies (This layer changes rarely)
+RUN apt-get update && apt-get install -y \
+    git \
+    git-lfs \
+    openssh-client \
+    cmake \
+    make \
+    g++ \
+    libpq-dev \
+    mesa-utils \
+    libgdal-dev \
+    osmium-tool \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+# 3. Install Poetry
 RUN pip install "poetry==$POETRY_VERSION"
-ENV PYTHONPATH="/app"
 
 # Add build argument for SSH key
 ARG SSH_PRIVATE_KEY
@@ -11,18 +30,17 @@ ENV PRIVATE_PACKAGES="typo_modal"
 
 WORKDIR /app
 
+# 4. Copy ONLY dependency files first
+# This ensures that editing your source code doesn't trigger a full 'poetry install'
 COPY poetry.lock pyproject.toml /app/
 
 RUN \
     # Set up SSH
-    apt-get update && apt-get install -y openssh-client git && \
     mkdir -p /root/.ssh && \
     echo "${SSH_PRIVATE_KEY}" | base64 -d > /root/.ssh/id_ed25519 && \
     chmod 600 /root/.ssh/id_ed25519 && \
     # Accept host keys automatically
     echo "StrictHostKeyChecking no" >> /root/.ssh/config && \
-    # Install system packages
-    apt-get install -y git cmake make g++ libpq-dev mesa-utils libgdal-dev && \
     # Poetry config
     poetry config installer.max-workers 10 && \
     poetry config virtualenvs.create false && \
@@ -43,7 +61,29 @@ RUN \
         fi \
     done
 
+
+# Likely temporary: clone the repo itself to get the data from lfs.
+# THIS NEEDS THE DEV TO PROCESS THE DATA WITH `make get-data` LOCALLY FIRST, THEN COMMIT THE LFS POINTERS TO THE REPO.
+# Otherwise, this image will potentially use outdated data.
+ARG DATA_REPO_URL="git@github.com:EPFL-ENAC/lasur-ws.git"
+ARG DATA_REPO_BRANCH="dev"
+ENV DATA_FOLDER="data"
+RUN mkdir -p /root/.ssh && \
+    echo "${SSH_PRIVATE_KEY}" | base64 -d > /root/.ssh/id_ed25519 && \
+    chmod 600 /root/.ssh/id_ed25519 && \
+    echo "StrictHostKeyChecking no" >> /root/.ssh/config && \
+    GIT_LFS_SKIP_SMUDGE=1 git clone \
+        --depth 1 \
+        --branch ${DATA_REPO_BRANCH} \
+        ${DATA_REPO_URL} /tmp/data_repo && \
+    mv /tmp/data_repo/${DATA_FOLDER} /app/${DATA_FOLDER} && \
+    rm -rf /tmp/data_repo && \
+    rm -rf /root/.ssh/
+
+
 COPY start.sh /app/
 COPY api /app/api
+COPY scripts /app/scripts
 
-ENTRYPOINT ["sh", "start.sh"]
+RUN chmod +x /app/start.sh
+ENTRYPOINT ["/bin/sh", "-c", "/app/start.sh data"]

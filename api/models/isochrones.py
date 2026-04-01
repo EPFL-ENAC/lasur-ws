@@ -52,3 +52,4 @@ class IsochronePoisData(IsochroneData):
 class IsochroneResponse(BaseModel):
     isochrones: FeatureCollection
     pois: Optional[FeatureCollection] = None
+    transit: Optional[FeatureCollection] = None
