@@ -133,10 +133,11 @@ class RecoProData(BaseModel):
     fm_pro_int_avio: int
 
 
-class ProJourney(BaseModel):
+class ProJourneyH3(BaseModel):
     mode: str
     days: int
     hex_id: str
+    constraints: list[str] = Field(default_factory=list)
 
 
 class RecoProData2(BaseModel):
@@ -144,7 +145,7 @@ class RecoProData2(BaseModel):
     score_tpu: int
     score_train: int
     score_elec: int
-    freq_mod_pro_journeys: Optional[List[ProJourney]] = Field(default=[])
+    freq_mod_pro_journeys: Optional[List[ProJourneyH3]] = Field(default=[])
     d_lon: float
     d_lat: float
 

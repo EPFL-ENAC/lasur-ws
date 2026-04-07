@@ -237,7 +237,7 @@ markers = {main = "platform_system == \"Windows\"", dev = "sys_platform == \"win
 
 [[package]]
 name = "extractosm"
-version = "0.1.2"
+version = "0.1.3"
 description = "Convenience package to extract various features from OpenStreetMap"
 optional = false
 python-versions = ">=3.11"
@@ -251,14 +251,11 @@ osmium = ">=4.3.0"
 osmnx = ">=2.1.0"
 pyarrow = ">=23.0.1"
 
-[package.extras]
-example = ["contextily (>=1.7.0)", "ipykernel (>=7.2.0)", "matplotlib (>=3.10.8)"]
-
 [package.source]
 type = "git"
 url = "https://github.com/EPFL-ENAC/extractosm.git"
-reference = "v0.1.2"
-resolved_reference = "c7b679337edc313bad6a11ffeb96e7759e5240da"
+reference = "v0.1.3"
+resolved_reference = "aadb692e4d697d9ce65f2056beacc1aeb7fa5457"
 
 [[package]]
 name = "fastapi"
@@ -1468,4 +1465,4 @@ standard = ["colorama (>=0.4) ; sys_platform == \"win32\"", "httptools (>=0.6.3)
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<4.0"
-content-hash = "b69cd694212d401c18727f069d562339853a7de319ea91aac8e5a5733ff31b47"
+content-hash = "06d2d348d793ec5db7fa19333d12c6466c963f7a3d1e511ecf2d7e9277865abe"
