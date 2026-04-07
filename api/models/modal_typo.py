@@ -137,6 +137,7 @@ class ProJourney(BaseModel):
     mode: str
     days: int
     hex_id: str
+    constraints: list[str] = Field(default_factory=list)
 
 
 class RecoProData2(BaseModel):
