@@ -85,7 +85,7 @@ async def get_pois(
         features = await pois_service.get_pois(
             bbox=data.bbox,
             categories=data.categories,
-            source=data.source,
+            area=data.source,
             cached=data.cached
         )
         return features
