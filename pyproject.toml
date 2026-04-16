@@ -7,8 +7,8 @@ dependencies = [
   "uvicorn>=0.34.0",
   "pydantic-settings>=2.8.0",
   "redis>=6.4.0",
-  # "typo-modal @ git+https://github.com/EPFL-LASUR/mobility-toolkit.git@v0.2.6",
-  "typo-modal @ git+ssh://git@github.com/EPFL-LASUR/mobility-toolkit.git@v0.2.6",
+  # "typo-modal @ git+https://github.com/EPFL-LASUR/mobility-toolkit.git@v0.2.7",
+  "typo-modal @ git+ssh://git@github.com/EPFL-LASUR/mobility-toolkit.git@v0.2.7",
   "isochrones @ git+https://github.com/EPFL-ENAC/isochrones.git@v0.5.0",
   "extractosm @ git+https://github.com/EPFL-ENAC/extractosm.git@v0.1.3",
 ]
