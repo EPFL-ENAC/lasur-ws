@@ -60,7 +60,11 @@ async def compute_isochrones(
             except Exception as e:
                 logging.error(e, exc_info=True)
 
-        filtered_routes, stops_in_filtered_routes = get_transit_within_isochrones(isochrones)
+        filtered_routes, stops_in_filtered_routes = get_transit_within_isochrones(
+            isochrones,
+            data.lat,
+            data.lon
+        )
         transit_dict = json.loads(sanitize_df(filtered_routes).to_json())
 
         return IsochroneResponse(
