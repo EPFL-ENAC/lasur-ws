@@ -1,6 +1,6 @@
 import geopandas as gpd
 from api.utils.osm import DEFAULT_AREA
-from isochrones import intersect_isochrones, filter_routes_by_isochrone
+from isochrones import intersect_isochrones, filter_routes_by_proximity
 
 from ..service.pois import PoisService
 
@@ -41,7 +41,7 @@ async def get_pois_within_isochrones(isochrones: gpd.GeoDataFrame, categories: l
     return intersected_pois
 
 
-def get_transit_within_isochrones(isochrone: gpd.GeoDataFrame, area: str | None = None) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
+def get_transit_within_isochrones(isochrone: gpd.GeoDataFrame, lat: float, lon: float, area: str | None = None) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
     """Fetch transit routes and stops within the bounding box of the isochrones and intersect them with the isochrones."""
     from .osm import get_transit_routes, get_transit_stops
 
@@ -51,6 +51,15 @@ def get_transit_within_isochrones(isochrone: gpd.GeoDataFrame, area: str | None 
     routes = get_transit_routes(area)
 
     # Filter transit data by the isochrone bounding box
-    filtered_routes, stops_in_filtered_routes = filter_routes_by_isochrone(routes=routes, stops=stops, isochrone=isochrone)
+    filtered_routes, stops_in_filtered_routes = filter_routes_by_proximity(
+         routes=routes, 
+         stops=stops, 
+         center_lat=lat,
+         center_lon=lon,
+         radius = 500.0,
+         min_stops = 1.0,
+         simplify = None,
+         isochrone=isochrone,
+    )
 
     return filtered_routes, stops_in_filtered_routes
