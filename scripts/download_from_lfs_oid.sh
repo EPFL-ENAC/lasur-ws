@@ -30,7 +30,7 @@ find "$TARGET_DIR" -type f | while read -r file; do
 
       echo "Downloading OID: ${OID}..."
 
-      if wget -O "$file" "$DOWNLOAD_URL"; then
+      if wget -q -O "$file" "$DOWNLOAD_URL"; then
         echo "Successfully replaced: $file"
       else
         echo "Error: Failed to download OID $OID for file $file"
