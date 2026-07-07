@@ -125,6 +125,49 @@ async def compute_reco_multi(
         return {'error': str(e)}
 
 
+@router.post("/reco-inter", response_model=Dict)
+async def compute_reco_inter(
+    data: RecoMultiData2,
+    api_key: str = Security(get_api_key),
+) -> Dict:
+    """Compute modal recommendation based on the provided data."""
+    service = TypoModalService(od_mm, orig_dess, dest_dess, can_df)
+    try:
+        t_traj_mm = service.compute_geo(
+            data.o_lon, data.o_lat, data.d_lon, data.d_lat)
+        reco_inter, scores, access, simple_labels, complex_labels, pt_pass = service.compute_reco_inter(t_traj_mm,
+                                                                                                        data.tps_traj,
+                                                                                                        data.constraints,
+                                                                                                        [journey.model_dump(
+                                                                                                        ) for journey in data.freq_mod_journeys],
+                                                                                                        data.a_voit,
+                                                                                                        data.a_moto,
+                                                                                                        data.a_tpu,
+                                                                                                        data.a_train,
+                                                                                                        data.a_velo,
+                                                                                                        data.a_marc,
+                                                                                                        data.i_tmps,
+                                                                                                        data.i_prix,
+                                                                                                        data.i_flex,
+                                                                                                        data.i_conf,
+                                                                                                        data.i_fiab,
+                                                                                                        data.i_prof,
+                                                                                                        data.i_envi
+                                                                                                        )
+        return {
+            'reco_inter': reco_inter,
+            'scores': scores,
+            'access': access,
+            'simple_labels': simple_labels,
+            'complex_labels': complex_labels,
+            'pt_pass': pt_pass,
+            't_traj_mm': t_traj_mm
+        }
+    except Exception as e:
+        logging.error(e, exc_info=True)
+        return {'error': str(e)}
+
+
 @router.post("/reco-pro", response_model=Dict)
 async def compute_reco_pro(
     data: RecoProData,
