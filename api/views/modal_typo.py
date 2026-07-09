@@ -135,27 +135,29 @@ async def compute_reco_inter(
     try:
         t_traj_mm = service.compute_geo(
             data.o_lon, data.o_lat, data.d_lon, data.d_lat)
-        reco_inter, scores, access, simple_labels, complex_labels, pt_pass = service.compute_reco_inter(t_traj_mm,
-                                                                                                        data.tps_traj,
-                                                                                                        data.constraints,
-                                                                                                        [journey.model_dump(
-                                                                                                        ) for journey in data.freq_mod_journeys],
-                                                                                                        data.a_voit,
-                                                                                                        data.a_moto,
-                                                                                                        data.a_tpu,
-                                                                                                        data.a_train,
-                                                                                                        data.a_velo,
-                                                                                                        data.a_marc,
-                                                                                                        data.i_tmps,
-                                                                                                        data.i_prix,
-                                                                                                        data.i_flex,
-                                                                                                        data.i_conf,
-                                                                                                        data.i_fiab,
-                                                                                                        data.i_prof,
-                                                                                                        data.i_envi
-                                                                                                        )
+        reco_inter, reco_simple, scores, access, simple_labels, complex_labels, pt_pass, bravo = service.compute_reco_inter(t_traj_mm,
+                                                                                                                            data.tps_traj,
+                                                                                                                            data.constraints,
+                                                                                                                            [journey.model_dump(
+                                                                                                                            ) for journey in data.freq_mod_journeys],
+                                                                                                                            data.a_voit,
+                                                                                                                            data.a_moto,
+                                                                                                                            data.a_tpu,
+                                                                                                                            data.a_train,
+                                                                                                                            data.a_velo,
+                                                                                                                            data.a_marc,
+                                                                                                                            data.i_tmps,
+                                                                                                                            data.i_prix,
+                                                                                                                            data.i_flex,
+                                                                                                                            data.i_conf,
+                                                                                                                            data.i_fiab,
+                                                                                                                            data.i_prof,
+                                                                                                                            data.i_envi
+                                                                                                                            )
         return {
             'reco_inter': reco_inter,
+            'reco_simple': reco_simple,
+            'bravo': bravo,
             'scores': scores,
             'access': access,
             'simple_labels': simple_labels,
