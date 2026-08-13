@@ -1379,7 +1379,7 @@ typing-extensions = ">=4.12.0"
 
 [[package]]
 name = "typo-modal"
-version = "0.3.1"
+version = "0.3.2"
 description = ""
 optional = false
 python-versions = ">=3.10,<4.0"
@@ -1397,7 +1397,7 @@ pyarrow = ">=21.0.0"
 type = "git"
 url = "ssh://git@github.com/EPFL-LASUR/mobility-toolkit.git"
 reference = "v0.3.2"
-resolved_reference = "84a979b125e3f3729d24f323f5ff9e48da7e2240"
+resolved_reference = "de7bb6026a81d3505d68290ca205a09b6bc3463b"
 
 [[package]]
 name = "tzdata"
