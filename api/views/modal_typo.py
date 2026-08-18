@@ -214,7 +214,7 @@ async def compute_reco_pro(
     """Compute pro modal recommendation based on the provided data."""
     service = TypoModalService(od_mm, orig_dess, dest_dess, can_df)
     try:
-        reco_pros = service.compute_reco_pro_h3({
+        reco_pros, bravo_pros = service.compute_reco_pro_h3({
             'velo': data.score_velo,
             'tpu': data.score_tpu,
             'train': data.score_train,
@@ -224,7 +224,7 @@ async def compute_reco_pro(
             data.d_lat,
             data.d_lon
         )
-        return {'reco_pros': reco_pros}
+        return {'reco_pros': reco_pros, 'bravo_pros': bravo_pros}
     except Exception as e:
         logging.error(e, exc_info=True)
         return {'error': str(e)}
@@ -243,6 +243,24 @@ async def compute_empl_actions(
             data.reco_dt2,
             data.reco_pro)
         return {'mesure_dt1': mesure_dt1, 'mesure_dt2': mesure_dt2, 'mesure_pro': mesure_pro}
+    except Exception as e:
+        logging.error(e, exc_info=True)
+        return {'error': str(e)}
+
+
+@router.post("/empl_v2", response_model=Dict)
+async def compute_empl_actions_v2(
+    data: EmplData,
+    api_key: str = Security(get_api_key),
+) -> Dict:
+    """Compute employer actions based on the provided data."""
+    service = TypoModalService(od_mm, orig_dess, dest_dess, can_df)
+    try:
+        mesure_dt, mesure_pro = service.compute_mesu_empl_v2(
+            data.empl.model_dump(),
+            data.reco_dt2,
+            data.reco_pro)
+        return {'mesure_dt': mesure_dt, 'mesure_pro': mesure_pro}
     except Exception as e:
         logging.error(e, exc_info=True)
         return {'error': str(e)}
