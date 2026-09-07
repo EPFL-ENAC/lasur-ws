@@ -1,7 +1,9 @@
 FROM python:3.11.13-slim-bookworm
 
 # 1. Environment variables
-ENV POETRY_VERSION=2.1.3 \
+ENV UV_VERSION=0.12.6 \
+    UV_PROJECT_ENVIRONMENT=/usr/local \
+    UV_LINK_MODE=copy \
     PYTHONPATH="/app" \
     PYTHONUNBUFFERED=1
 
@@ -20,8 +22,8 @@ RUN apt-get update && apt-get install -y \
     wget \
     && rm -rf /var/lib/apt/lists/*
 
-# 3. Install Poetry
-RUN pip install "poetry==$POETRY_VERSION"
+# 3. Install uv
+RUN pip install "uv==$UV_VERSION"
 
 # Add build argument for SSH key
 ARG SSH_PRIVATE_KEY
@@ -31,8 +33,8 @@ ENV PRIVATE_PACKAGES="typo_modal"
 WORKDIR /app
 
 # 4. Copy ONLY dependency files first
-# This ensures that editing your source code doesn't trigger a full 'poetry install'
-COPY poetry.lock pyproject.toml /app/
+# This ensures that editing your source code doesn't trigger a full 'uv sync'
+COPY uv.lock pyproject.toml /app/
 
 RUN \
     # Set up SSH
@@ -41,12 +43,10 @@ RUN \
     chmod 600 /root/.ssh/id_ed25519 && \
     # Accept host keys automatically
     echo "StrictHostKeyChecking no" >> /root/.ssh/config && \
-    # Poetry config
-    poetry config installer.max-workers 10 && \
-    poetry config virtualenvs.create false && \
-    poetry install --no-interaction --no-root -v && \
+    # Install dependencies into the system environment (UV_PROJECT_ENVIRONMENT)
+    uv sync --locked --no-dev --no-install-project --no-cache && \
     # Remove python caches
-    rm -rf /root/.cache/pypoetry /root/.cache/pip && \
+    rm -rf /root/.cache/uv /root/.cache/pip && \
     # Important: Remove the SSH key after using it
     rm -rf /root/.ssh/ && \
     # Precompile and remove source files

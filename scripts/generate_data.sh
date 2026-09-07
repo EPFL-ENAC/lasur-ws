@@ -67,7 +67,7 @@ get_data() {
     echo "Generating GeoParquet..."
     
     mkdir -p "$DESTINATION_FOLDER"
-    time poetry run python ./scripts/generate_geoparquet.py "$FILTERED_PBF" --output-dir "$DESTINATION_FOLDER"
+    time uv run python ./scripts/generate_geoparquet.py "$FILTERED_PBF" --output-dir "$DESTINATION_FOLDER"
 }
 
 cleanup() {
