@@ -152,6 +152,7 @@ class RecoProData2(BaseModel):
 
 class EmplActions(BaseModel):
     mesures_globa: Optional[List[str]] = Field(default=[])
+    mesures_tp: Optional[List[str]] = Field(default=[])
     mesures_tpu: Optional[List[str]] = Field(default=[])
     mesures_train: Optional[List[str]] = Field(default=[])
     mesures_inter: Optional[List[str]] = Field(default=[])
@@ -159,6 +160,7 @@ class EmplActions(BaseModel):
     mesures_covoit: Optional[List[str]] = Field(default=[])
     mesures_elec: Optional[List[str]] = Field(default=[])
     mesures_pro_velo: Optional[List[str]] = Field(default=[])
+    mesures_pro_tp: Optional[List[str]] = Field(default=[])
     mesures_pro_tpu: Optional[List[str]] = Field(default=[])
     mesures_pro_train: Optional[List[str]] = Field(default=[])
     mesures_pro_elec: Optional[List[str]] = Field(default=[])
