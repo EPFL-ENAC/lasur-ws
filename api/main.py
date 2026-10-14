@@ -15,7 +15,7 @@ basicConfig(level=DEBUG)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    resolve_lfs_pointers(config.DATA_FOLDER, config.LFS_USERNAME, config.LFS_PASSWORD, config.LFS_SERVER_PATH)
+    resolve_lfs_pointers(config.DATA_FOLDER, config.DATA_URL)
     yield
 
 

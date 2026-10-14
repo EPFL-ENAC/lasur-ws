@@ -1,4 +1,3 @@
-import base64
 import hashlib
 import logging
 import os
@@ -21,33 +20,32 @@ def parse_pointer(path: Path) -> tuple[str, int] | None:
     return fields["oid"].removeprefix("sha256:").strip(), int(fields["size"])
 
 
-def download_object(url: str, auth: str, path: Path, oid: str, size: int) -> None:
+def download_object(url: str, path: Path, oid: str, size: int) -> None:
     """Download an LFS object to a temp file, verify it, then atomically replace the pointer."""
-    request = urllib.request.Request(url, headers={"Authorization": f"Basic {auth}"})
     sha = hashlib.sha256()
     fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=f".{path.name}.")
     try:
-        with os.fdopen(fd, "wb") as out, urllib.request.urlopen(request, timeout=60) as response:
+        with os.fdopen(fd, "wb") as out, urllib.request.urlopen(url, timeout=60) as response:
             while chunk := response.read(1 << 20):
                 sha.update(chunk)
                 out.write(chunk)
         actual_size = os.path.getsize(tmp)
         if actual_size != size or sha.hexdigest() != oid:
             raise ValueError(f"{path}: checksum/size mismatch (got {actual_size} bytes, expected {size})")
+        os.chmod(tmp, 0o644)
         os.replace(tmp, path)
     except BaseException:
         os.unlink(tmp)
         raise
 
 
-def resolve_lfs_pointers(data_dir: str, username: str, password: str, server_path: str) -> None:
-    """Replace every Git LFS pointer under data_dir with its verified object. Raises on any failure."""
-    pointers = [(p, ptr) for p in Path(data_dir).rglob("*") if p.is_file() and (ptr := parse_pointer(p))]
-    if not pointers:
-        return
-    if not (username and password and server_path):
-        raise RuntimeError(f"{len(pointers)} LFS pointer(s) in '{data_dir}' but LFS_USERNAME/LFS_PASSWORD/LFS_SERVER_PATH not set")
-    auth = base64.b64encode(f"{username}:{password}".encode()).decode()
-    for path, (oid, size) in pointers:
-        logging.info(f"Downloading LFS object {oid} ({size} bytes) -> {path}")
-        download_object(f"https://{server_path}/object/{oid}", auth, path, oid, size)
+def resolve_lfs_pointers(data_dir: str, data_url: str) -> None:
+    """Replace every Git LFS pointer under data_dir with its verified copy from data_url
+    (same relative path, e.g. <data_url>/geneva/routes.parquet). Raises on any failure."""
+    root = Path(data_dir)
+    for path in list(root.rglob("*")):
+        if path.is_file() and (pointer := parse_pointer(path)):
+            oid, size = pointer
+            url = f"{data_url.rstrip('/')}/{path.relative_to(root).as_posix()}"
+            logging.info(f"Downloading {url} ({size} bytes) -> {path}")
+            download_object(url, path, oid, size)

@@ -28,11 +28,11 @@ def test_lfs_download_verifies_and_keeps_pointer_on_mismatch(tmp_path):
     base = f"http://127.0.0.1:{server.server_port}"
     try:
         with pytest.raises(ValueError):
-            download_object(f"{base}/bad", "x", target, oid, len(payload))
+            download_object(f"{base}/bad", target, oid, len(payload))
         assert target.read_text() == pointer  # failed download leaves pointer untouched
         assert list(data.iterdir()) == [target]  # temp file cleaned up
 
-        download_object(f"{base}/{oid}", "x", target, oid, len(payload))
+        download_object(f"{base}/{oid}", target, oid, len(payload))
         assert target.read_bytes() == payload
         assert parse_pointer(target) is None
     finally:

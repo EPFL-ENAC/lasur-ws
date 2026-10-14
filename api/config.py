@@ -14,11 +14,9 @@ class Config(BaseSettings):
 
     OTP_URL: str = "https://lasur-otp.epfl.ch"
 
-    # Git LFS pointers found in DATA_FOLDER are downloaded at startup
+    # Git LFS pointers found in DATA_FOLDER are downloaded at startup from DATA_URL (same relative paths)
     DATA_FOLDER: str = "data"
-    LFS_USERNAME: str = ""
-    LFS_PASSWORD: str = ""
-    LFS_SERVER_PATH: str = ""
+    DATA_URL: str = "https://enacit4r-cdn.epfl.ch/lasur-ws/2026-10-14T10:25"
 
 
 @lru_cache()
