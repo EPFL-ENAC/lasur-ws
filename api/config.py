@@ -14,9 +14,11 @@ class Config(BaseSettings):
 
     OTP_URL: str = "https://lasur-otp.epfl.ch"
 
-    LFS_USERNAME: str = "" # only used on build
-    LFS_PASSWORD: str = "" # only used on build
-    LFS_SERVER_PATH: str = "" # only used on build
+    # Git LFS pointers found in DATA_FOLDER are downloaded at startup
+    DATA_FOLDER: str = "data"
+    LFS_USERNAME: str = ""
+    LFS_PASSWORD: str = ""
+    LFS_SERVER_PATH: str = ""
 
 
 @lru_cache()

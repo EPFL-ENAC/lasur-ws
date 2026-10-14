@@ -86,4 +86,4 @@ COPY api /app/api
 COPY scripts /app/scripts
 
 RUN chmod +x /app/start.sh
-ENTRYPOINT ["/bin/sh", "-c", "/app/start.sh data"]
+ENTRYPOINT ["/bin/sh", "-c", "/app/start.sh"]
