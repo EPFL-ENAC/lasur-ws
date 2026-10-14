@@ -1,3 +1,9 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:0e3e040ca2f1a3a53e29239c4297f5c260553331c9616080eca9c25f3d11ea96
-size 238
+version=$(shell date +%FT%H:%M)
+bucket=10208-fcd9acb029f419e6493edf97f4592b96
+folder=lasur-ws
+
+help:
+	@echo s3://${bucket}/${folder}/
+
+cdn:
+	s3cmd put --recursive --acl-public --guess-mime-type geneva s3://${bucket}/${folder}/${version}/
