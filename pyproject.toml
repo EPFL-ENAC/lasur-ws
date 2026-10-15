@@ -1,23 +1,31 @@
 [project]
 name = "api"
-version = "0.4.0"
+version = "1.0.0"
 requires-python = ">=3.11,<4.0"
 dependencies = [
   "fastapi>=0.115.8",
   "uvicorn>=0.34.0",
   "pydantic-settings>=2.8.0",
   "redis>=6.4.0",
-  "typo-modal @ git+https://github.com/EPFL-LASUR/mobility-toolkit.git@0.2.2",
-  "isochrones @ git+https://github.com/EPFL-ENAC/isochrones.git@0.4.1",
+  "isochrones @ git+https://github.com/EPFL-ENAC/isochrones.git@v0.5.1",
+  "extractosm @ git+https://github.com/EPFL-ENAC/extractosm.git@v0.1.3",
+  "typo-modal @ git+ssh://git@github.com/EPFL-LASUR/mobility-toolkit.git@v0.3.4",
 ]
 description = "LASUR Web Services"
 authors = [{ name = "Yannick Marcon", email = "yannick.marcon@epfl.ch" }]
-license = "GPLv3"
+license = { text = "GPLv3" }
 readme = "README.md"
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.3.4"
+[dependency-groups]
+dev = [
+  "pytest>=8.3.4",
+]
+
+[tool.uv.build-backend]
+module-name = "api"
+module-root = ""
+namespace = true
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.12.6,<0.13"]
+build-backend = "uv_build"

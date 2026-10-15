@@ -1,17 +1,17 @@
 build:
-	poetry build
+	uv build
 
 install:
-	poetry install
+	uv sync
 
 update:
-	poetry lock
+	uv lock --upgrade
 
 test:
-	poetry run pytest -s
+	uv run pytest -s
 
 run:
-	poetry run uvicorn api.main:app
+	uv run uvicorn --port 8001 api.main:app
 
 redis-up:
 	docker compose up -d redis
@@ -21,3 +21,7 @@ redis-stop:
 
 redis-down:
 	docker compose down redis
+
+get-data:
+	chmod +x ./scripts/generate_data.sh
+	./scripts/generate_data.sh

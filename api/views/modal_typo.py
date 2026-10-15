@@ -84,7 +84,7 @@ async def compute_reco(
                                                   data.i_fiab,
                                                   data.i_prof,
                                                   data.i_envi)
-        return {'reco_dt': reco_dt, 'scores': scores}
+        return {'reco_dt': reco_dt, 'scores': scores, 't_traj_mm': t_traj_mm}
     except Exception as e:
         logging.error(e, exc_info=True)
         return {'error': str(e)}
@@ -119,7 +119,52 @@ async def compute_reco_multi(
                                                               data.i_prof,
                                                               data.i_envi
                                                               )
-        return {'reco_dt2': reco_dt2, 'scores': scores, 'access': access}
+        return {'reco_dt2': reco_dt2, 'scores': scores, 'access': access, 't_traj_mm': t_traj_mm}
+    except Exception as e:
+        logging.error(e, exc_info=True)
+        return {'error': str(e)}
+
+
+@router.post("/reco-inter", response_model=Dict)
+async def compute_reco_inter(
+    data: RecoMultiData2,
+    api_key: str = Security(get_api_key),
+) -> Dict:
+    """Compute modal recommendation based on the provided data."""
+    service = TypoModalService(od_mm, orig_dess, dest_dess, can_df)
+    try:
+        t_traj_mm = service.compute_geo(
+            data.o_lon, data.o_lat, data.d_lon, data.d_lat)
+        reco_inter, reco_simple, scores, access, simple_labels, complex_labels, pt_pass, bravo = service.compute_reco_inter(t_traj_mm,
+                                                                                                                            data.tps_traj,
+                                                                                                                            data.constraints,
+                                                                                                                            [journey.model_dump(
+                                                                                                                            ) for journey in data.freq_mod_journeys],
+                                                                                                                            data.a_voit,
+                                                                                                                            data.a_moto,
+                                                                                                                            data.a_tpu,
+                                                                                                                            data.a_train,
+                                                                                                                            data.a_velo,
+                                                                                                                            data.a_marc,
+                                                                                                                            data.i_tmps,
+                                                                                                                            data.i_prix,
+                                                                                                                            data.i_flex,
+                                                                                                                            data.i_conf,
+                                                                                                                            data.i_fiab,
+                                                                                                                            data.i_prof,
+                                                                                                                            data.i_envi
+                                                                                                                            )
+        return {
+            'reco_inter': reco_inter,
+            'reco_simple': reco_simple,
+            'bravo': bravo,
+            'scores': scores,
+            'access': access,
+            'simple_labels': simple_labels,
+            'complex_labels': complex_labels,
+            'pt_pass': pt_pass,
+            't_traj_mm': t_traj_mm
+        }
     except Exception as e:
         logging.error(e, exc_info=True)
         return {'error': str(e)}
@@ -169,7 +214,7 @@ async def compute_reco_pro(
     """Compute pro modal recommendation based on the provided data."""
     service = TypoModalService(od_mm, orig_dess, dest_dess, can_df)
     try:
-        reco_pros = service.compute_reco_pro_h3({
+        reco_pros, bravo_pros = service.compute_reco_pro_h3({
             'velo': data.score_velo,
             'tpu': data.score_tpu,
             'train': data.score_train,
@@ -179,7 +224,7 @@ async def compute_reco_pro(
             data.d_lat,
             data.d_lon
         )
-        return {'reco_pros': reco_pros}
+        return {'reco_pros': reco_pros, 'bravo_pros': bravo_pros}
     except Exception as e:
         logging.error(e, exc_info=True)
         return {'error': str(e)}
@@ -198,6 +243,24 @@ async def compute_empl_actions(
             data.reco_dt2,
             data.reco_pro)
         return {'mesure_dt1': mesure_dt1, 'mesure_dt2': mesure_dt2, 'mesure_pro': mesure_pro}
+    except Exception as e:
+        logging.error(e, exc_info=True)
+        return {'error': str(e)}
+
+
+@router.post("/empl_v2", response_model=Dict)
+async def compute_empl_actions_v2(
+    data: EmplData,
+    api_key: str = Security(get_api_key),
+) -> Dict:
+    """Compute employer actions based on the provided data."""
+    service = TypoModalService(od_mm, orig_dess, dest_dess, can_df)
+    try:
+        mesure_dt, mesure_pro = service.compute_mesu_empl_v2(
+            data.empl.model_dump(),
+            data.reco_dt2,
+            data.reco_pro)
+        return {'mesure_dt': mesure_dt, 'mesure_pro': mesure_pro}
     except Exception as e:
         logging.error(e, exc_info=True)
         return {'error': str(e)}
