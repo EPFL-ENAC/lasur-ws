@@ -1,3 +1,4 @@
+import datetime as dt
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field, field_validator
 
@@ -13,6 +14,12 @@ class IsochroneData(BaseModel):
     mode: Optional[str] = "WALK"  # e.g., "WALK", "BICYCLE", "TRANSIT"
     bikeSpeed: Optional[float] = None
     router: Optional[str] = "default"
+
+    @field_validator("datetime")
+    @classmethod
+    def check_datetime(cls, value: str) -> str:
+        dt.datetime.fromisoformat(value)
+        return value
 
 
 class FeatureGeometry(BaseModel):

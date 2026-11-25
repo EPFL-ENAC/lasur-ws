@@ -111,7 +111,7 @@ async def get_pois(
         return count_by_category
     except Exception as e:
         logging.error(e, exc_info=True)
-        return {'error': str(e)}
+        return {'error': 'Internal error'}
 
 
 @router.delete("/pois/_cache", response_model=None)

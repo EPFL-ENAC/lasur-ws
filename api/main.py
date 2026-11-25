@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
-from logging import basicConfig, INFO, DEBUG
+from logging import basicConfig, INFO
 from pydantic import BaseModel
 from .views.modal_typo import router as modal_typo_router
 from .views.auth import router as auth_router
@@ -9,7 +9,7 @@ from .views.isochrones import router as isochrones_router
 from .config import config
 from .utils.lfs import resolve_lfs_pointers
 
-basicConfig(level=DEBUG)
+basicConfig(level=INFO)
 
 
 
@@ -26,7 +26,6 @@ origins = ["*"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
