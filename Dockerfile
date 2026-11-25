@@ -1,38 +1,27 @@
-FROM python:3.11.13-slim-bookworm
+# Ubuntu: Debian images carry unfixed HIGH CVEs that fail the Trivy scan. Python is
+# the distribution's so that it is patched with it and visible to the scan.
+FROM ubuntu:24.04 AS build
+COPY --from=ghcr.io/astral-sh/uv:0.13.4 /uv /bin/
+ENV UV_PROJECT_ENVIRONMENT=/opt/venv \
+    UV_PYTHON=/usr/bin/python3 \
+    UV_LINK_MODE=copy
 
-# 1. Environment variables
-ENV UV_VERSION=0.12.6 \
-    UV_PROJECT_ENVIRONMENT=/usr/local \
-    UV_LINK_MODE=copy \
-    PYTHONPATH="/app" \
-    PYTHONUNBUFFERED=1
-
-# 2. Install System Dependencies (This layer changes rarely)
-RUN apt-get update && apt-get install -y \
+# git, openssh-client: private git dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
     git \
-    git-lfs \
     openssh-client \
-    cmake \
-    make \
-    g++ \
-    libpq-dev \
-    mesa-utils \
-    libgdal-dev \
-    osmium-tool \
-    wget \
+    python3 \
     && rm -rf /var/lib/apt/lists/*
 
-# 3. Install uv
-RUN pip install "uv==$UV_VERSION"
-
-# Add build argument for SSH key
+# Build argument for the SSH key: this stage only, so that it is not in the final image history
 ARG SSH_PRIVATE_KEY
 # Private packages to precompile and source files to remove
 ENV PRIVATE_PACKAGES="typo_modal"
 
 WORKDIR /app
 
-# 4. Copy ONLY dependency files first
+# Copy ONLY dependency files first
 # This ensures that editing your source code doesn't trigger a full 'uv sync'
 COPY uv.lock pyproject.toml /app/
 
@@ -43,24 +32,21 @@ RUN \
     chmod 600 /root/.ssh/id_ed25519 && \
     # Accept host keys automatically
     echo "StrictHostKeyChecking no" >> /root/.ssh/config && \
-    # Install dependencies into the system environment (UV_PROJECT_ENVIRONMENT)
+    # Install dependencies into the virtual environment (UV_PROJECT_ENVIRONMENT)
     uv sync --locked --no-dev --no-install-project --no-cache && \
-    # Remove python caches
-    rm -rf /root/.cache/uv /root/.cache/pip && \
     # Important: Remove the SSH key after using it
     rm -rf /root/.ssh/ && \
     # Precompile and remove source files
     for pkg in $PRIVATE_PACKAGES; do \
-        path=$(python -c "import $pkg; print($pkg.__path__[0])" 2>/dev/null) && \
+        path=$(/opt/venv/bin/python -c "import $pkg; print($pkg.__path__[0])" 2>/dev/null) && \
         if [ -n "$path" ]; then \
             echo "Compiling $pkg at $path..."; \
-            python -m compileall -b -f "$path"; \
+            /opt/venv/bin/python -m compileall -b -f "$path"; \
             find "$path" -name "*.py" -type f -delete; \
         else \
             echo "$pkg is not installed."; \
         fi \
     done
-
 
 # Likely temporary: clone the repo itself to get the data from lfs.
 # THIS NEEDS THE DEV TO PROCESS THE DATA WITH `make get-data` LOCALLY FIRST, THEN COMMIT THE LFS POINTERS TO THE REPO.
@@ -81,9 +67,24 @@ RUN mkdir -p /root/.ssh && \
     rm -rf /root/.ssh/
 
 
+FROM ubuntu:24.04
+ENV PATH="/opt/venv/bin:$PATH" \
+    PYTHONPATH="/app" \
+    PYTHONUNBUFFERED=1 \
+    DATA_FOLDER="data"
+
+# libexpat1: needed by the osmium wheel
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    libexpat1 \
+    python3 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY --from=build /opt/venv /opt/venv
+COPY --from=build /app/data /app/data
 COPY start.sh /app/
 COPY api /app/api
-COPY scripts /app/scripts
 
 RUN chmod +x /app/start.sh
 ENTRYPOINT ["/bin/sh", "-c", "/app/start.sh"]
