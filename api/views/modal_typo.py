@@ -21,7 +21,7 @@ async def compute_geo(
         return service.compute_geo(odData.o_lon, odData.o_lat, odData.d_lon, odData.d_lat)
     except Exception as e:
         logging.error(e, exc_info=True)
-        return {'error': str(e)}
+        return {'error': 'Internal error'}
 
 
 @router.post("/typo", response_model=Dict)
@@ -49,7 +49,7 @@ async def compute_typo(
         return {'typo': typo}
     except Exception as e:
         logging.error(e, exc_info=True)
-        return {'error': str(e)}
+        return {'error': 'Internal error'}
 
 
 @router.post("/reco", response_model=Dict)
@@ -87,7 +87,7 @@ async def compute_reco(
         return {'reco_dt': reco_dt, 'scores': scores, 't_traj_mm': t_traj_mm}
     except Exception as e:
         logging.error(e, exc_info=True)
-        return {'error': str(e)}
+        return {'error': 'Internal error'}
 
 
 @router.post("/reco-multi", response_model=Dict)
@@ -122,7 +122,7 @@ async def compute_reco_multi(
         return {'reco_dt2': reco_dt2, 'scores': scores, 'access': access, 't_traj_mm': t_traj_mm}
     except Exception as e:
         logging.error(e, exc_info=True)
-        return {'error': str(e)}
+        return {'error': 'Internal error'}
 
 
 @router.post("/reco-inter", response_model=Dict)
@@ -167,7 +167,7 @@ async def compute_reco_inter(
         }
     except Exception as e:
         logging.error(e, exc_info=True)
-        return {'error': str(e)}
+        return {'error': 'Internal error'}
 
 
 @router.post("/reco-pro", response_model=Dict)
@@ -203,7 +203,7 @@ async def compute_reco_pro(
         return {'reco_pro_loc': reco_pro_loc, 'reco_pro_reg': reco_pro_reg, 'reco_pro_int': reco_pro_int}
     except Exception as e:
         logging.error(e, exc_info=True)
-        return {'error': str(e)}
+        return {'error': 'Internal error'}
 
 
 @router.post("/reco-pro-h3", response_model=Dict)
@@ -227,7 +227,7 @@ async def compute_reco_pro(
         return {'reco_pros': reco_pros, 'bravo_pros': bravo_pros}
     except Exception as e:
         logging.error(e, exc_info=True)
-        return {'error': str(e)}
+        return {'error': 'Internal error'}
 
 
 @router.post("/empl", response_model=Dict)
@@ -245,7 +245,7 @@ async def compute_empl_actions(
         return {'mesure_dt1': mesure_dt1, 'mesure_dt2': mesure_dt2, 'mesure_pro': mesure_pro}
     except Exception as e:
         logging.error(e, exc_info=True)
-        return {'error': str(e)}
+        return {'error': 'Internal error'}
 
 
 @router.post("/empl_v2", response_model=Dict)
@@ -263,4 +263,4 @@ async def compute_empl_actions_v2(
         return {'mesure_dt': mesure_dt, 'mesure_pro': mesure_pro}
     except Exception as e:
         logging.error(e, exc_info=True)
-        return {'error': str(e)}
+        return {'error': 'Internal error'}
